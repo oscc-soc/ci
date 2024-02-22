@@ -1,21 +1,27 @@
 # This is the default submit config
 [meta]
+project = "demo"
+author  = "Ben"
 version = "1.0"
 
-# iverilog
-[iv_config]
+[core]
+name     = "ysyx_xxxxxxxx.v" # core name
+top      = "ysyx_xxxxxxxx"   # top name
+clk_name = "clk"             # top clock signal name
+
+[iverilog]
 commit_info = "iv"
 
-# verilator
-[ver_config]
+[verilator]
 commit_info = "ver"
 
-[vcs_config]
+[vcs]
 commit_info = "vcs"
-prog = 'all' # format: [prog]-[type] prog: [hello, memtest, rtthread] type: [flash, mem, sdram]
-freq = 100 # [100, 800, step: 50]
-debug = {wave = "off", prog = "hello-flash"}
+prog        = 'all'  # format: [prog]-[type] prog: [hello, memtest, rtthread] type: [flash, mem, sdram]
+debug       = {wave = "off", prog = "hello-flash"}
 
-[dc_config]
+[dc]
 commit_info = "dc"
-freq = 100 # [100, 800, step: 50]
+freq        = 100   # [100, 800, step: 50]
+corner      = "TYP" # [WCZ MAX WCL TYP MIN ML MZ]
+retiming    = "off" # [off on]

@@ -10,7 +10,7 @@ import dispatch
 # func:
 # 1. check code similarity, record commit info(freq, time) -> web
 # 2. verilator test
-# 3. (iverilog test)
+# 3. iverilog test
 # 4. vcs test
 # struct:
 # toml, database
