@@ -1,0 +1,21 @@
+# This is the default submit config
+[meta]
+version = "1.0"
+
+# iverilog
+[iv_config]
+commit_info = "iv"
+
+# verilator
+[ver_config]
+commit_info = "ver"
+
+[vcs_config]
+commit_info = "vcs"
+prog = 'all' # format: [prog]-[type] prog: [hello, memtest, rtthread] type: [flash, mem, sdram]
+freq = 100 # [100, 800, step: 50]
+debug = {wave = "off", prog = "hello-flash"}
+
+[dc_config]
+commit_info = "dc"
+freq = 100 # [100, 800, step: 50]
