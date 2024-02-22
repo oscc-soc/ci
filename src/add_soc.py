@@ -3,7 +3,7 @@
 import os
 import re
 from typing import List
-import cicd_config
+import config
 from data_type import CoreInfo
 
 
@@ -16,10 +16,13 @@ class Cores(object):
         self.submit_list.clear()
         self.core_list.clear()
 
-    # 1. pattern: ysyx_([0-9]{6})
-    # 2. in id list
+    # 1. pattern: ysyx_([0-9]{8})
+    # 2. pattern: ysyx_([0-9]{6})
+    # 3. in id list
     def check_valid(self, val: str) -> str:
         if re.match('ysyx_[0-9]{8}', val) is not None:
+            return val
+        elif re.match('ysyx_[0-9]{6}', val) is not None:
             return val
         else:
             return ''
@@ -32,10 +35,10 @@ class Cores(object):
         print(f'ID: error format, the err val: {val}')
 
     def add(self):
-        with open(cicd_config.SUBMIT_LIST_PATH, 'r+', encoding='utf-8') as fp:
+        with open(config.SUBMIT_LIST_PATH, 'r+', encoding='utf-8') as fp:
             for v in fp.readlines():
                 tmp = v.split()
-                # print(tmp[1])
+                print(tmp[1])
                 if self.check_valid(tmp[1]) != '':
                     self.fill_data(tmp)
                 else:
@@ -43,10 +46,10 @@ class Cores(object):
 
     # update the core list
     def update(self):
-        os.chdir(cicd_config.SUBMIT_DIR)
-        # os.system('git checkout ' + cicd_config.CUR_BRAN)
-        print(f'git checkout {cicd_config.CUR_BRAN}')
-        with open(cicd_config.CORE_LIST_PATH, 'r+', encoding='utf-8') as fp:
+        os.chdir(config.SUBMIT_DIR)
+        # os.system('git checkout ' + config.CUR_BRAN)
+        print(f'git checkout {config.CUR_BRAN}')
+        with open(config.CORE_LIST_PATH, 'r+', encoding='utf-8') as fp:
             for v in fp.readlines():
                 tmp = v.split()
                 # print('id: ' + val)
@@ -67,7 +70,7 @@ class Cores(object):
                     break
 
             if is_find is False:
-                os.system(f'git clone {va.url} submit/{va.sid}')
+                # os.system(f'git clone {va.url} submit/{va.sid}')
                 print(f'git clone {va.url} submit/{va.sid}')
                 new_id.append(CoreInfo('', va.sid, 'F'))
 
@@ -75,7 +78,7 @@ class Cores(object):
         self.core_list += new_id
         self.core_list.sort(key=lambda v: v.sid)
         # print(self.core_list)
-        with open(cicd_config.CORE_LIST_PATH, 'w+', encoding='utf-8') as fp:
+        with open(config.CORE_LIST_PATH, 'w+', encoding='utf-8') as fp:
             for v in self.core_list:
                 fp.write(v.sid + ' ' + v.flag + '\n')
 

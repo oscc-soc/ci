@@ -4,11 +4,11 @@ import re
 # import argparse
 import time
 # import datetime
-import cicd_config
+import config
 
 freqlist = ['100']
 for freq in freqlist:
-    with open(cicd_config.DC_HOME_DIR + '/asic_top/ysyx_229998.tcl',
+    with open(config.DC_HOME_DIR + '/asic_top/ysyx_229998.tcl',
               encoding='utf-8') as fp:
         message = ''
         for line in fp:
@@ -16,7 +16,7 @@ for freq in freqlist:
                           'u0_rcg/u0_pll/CLK_OUT {freq_p}'.format(freq_p=freq),
                           line)
             message += line
-    with open(cicd_config.DC_HOME_DIR + '/asic_top/ysyx_229998.tcl',
+    with open(config.DC_HOME_DIR + '/asic_top/ysyx_229998.tcl',
               'w',
               encoding='utf-8') as fp:
         fp.write(message)
@@ -39,7 +39,7 @@ for freq in freqlist:
                 .format(corner_p=corner, track_p=track, vt_p=vt, user_p=user))
             # os.system(
             # './report_filter -d ysyx_229998 -u {user_p}'.format(user_p=user))
-            os.chdir(cicd_config.DC_LOG_DIR)
+            os.chdir(config.DC_LOG_DIR)
             print(f'Current working directory: {0}'.format(os.getcwd()))
 
             user_name = top_name + '_' + user
@@ -167,7 +167,7 @@ for freq in freqlist:
                     i - 1, j - 1)
                 fp.write(tmp)
 
-            os.chdir(cicd_config.DC_RPT_DIR)
+            os.chdir(config.DC_RPT_DIR)
             print(f'Current working directory: {0}'.format(os.getcwd()))
 
             rpt_name = user_name + '/' + top_name + '.statistics.rpt'
@@ -202,7 +202,7 @@ for freq in freqlist:
                 else:
                     fp.write('\n\nf=100Mhz FAIL!!!')
 
-            os.chdir(cicd_config.DC_HOME_DIR)
+            os.chdir(config.DC_HOME_DIR)
 
             with open(result_name, 'a', encoding='utf-8') as fp:
                 txt = '\n\n================AREA REPORT================\n\n'

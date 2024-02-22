@@ -2,7 +2,7 @@
 
 import os
 from typing import List
-import cicd_config
+import config
 
 rpt_home = ''
 dut_core = ''
@@ -132,7 +132,7 @@ def system_test():
 
 def create_rpt_dir() -> bool:
     is_have = False
-    with open(cicd_config.QUEUE_LIST_PATH, 'r+', encoding='utf-8') as fp:
+    with open(config.QUEUE_LIST_PATH, 'r+', encoding='utf-8') as fp:
         cores = fp.readlines()
         if cores != []:
             # rec's format: ['submit/ysyx_210153', '2022-08-18' '09:05:40']
@@ -141,8 +141,8 @@ def create_rpt_dir() -> bool:
             dut_core = rec[0].split('/')[1]
 
             # record queue state
-            os.system('mkdir -p ' + cicd_config.RPT_DIR + dut_core)
-            os.system('echo state: under test > ' + cicd_config.RPT_DIR +
+            os.system('mkdir -p ' + config.RPT_DIR + dut_core)
+            os.system('echo state: under test > ' + config.RPT_DIR +
                       dut_core + '/state')
 
             # remove record from queue
@@ -157,18 +157,18 @@ def create_rpt_dir() -> bool:
             cores = fp.readlines()
             cnt = 1
             for v in cores:
-                v_path = cicd_config.RPT_DIR + v.split()[0].split('/')[1]
+                v_path = config.RPT_DIR + v.split()[0].split('/')[1]
                 os.system('mkdir -p ' + v_path)
                 os.system('echo state: wait ' + str(cnt) + ' cores > ' +
                           v_path + '/state')
                 cnt += 1
 
-            cicd_config.git_commit(cicd_config.RPT_DIR,
+            config.git_commit(config.RPT_DIR,
                                    '[bot] update soc state file', True)
 
             # soc integration
             global rpt_home
-            rpt_home = cicd_config.RPT_DIR + dut_core
+            rpt_home = config.RPT_DIR + dut_core
             rpt_home += '/' + rec[1] + '...' + rec[2]
             os.system('mkdir -p ' + rpt_home)
             soc_intg(rec)
@@ -180,7 +180,7 @@ def create_rpt_dir() -> bool:
 
 # rec's format: ['submit/ysyx_210153', '2022-08-18' '09:05:40']
 def soc_intg(rec: List[str]):
-    core_path = cicd_config.SUBMIT_DIR + rec[0] + '/' + rec[0].split('/')[1]
+    core_path = config.SUBMIT_DIR + rec[0] + '/' + rec[0].split('/')[1]
     v_format = core_path + '.v'
     sv_format = core_path + '.sv'
     if os.path.isfile(v_format):
@@ -191,7 +191,7 @@ def soc_intg(rec: List[str]):
     else:
         print('no core file!')
 
-    # print('cp ' + cicd_config.SUBMIT_DIR  + rec[0] + '/' + rec[0] + '.v')
+    # print('cp ' + config.SUBMIT_DIR  + rec[0] + '/' + rec[0] + '.v')
     os.chdir('lib/vcs/script')
     os.system('python autowire.py')
     os.chdir('../../')
@@ -204,10 +204,10 @@ def clean_vcs_env():
 
 
 def clean_dc_env():
-    os.chdir(cicd_config.HOME_DIR + 'lib/dc/bes_data/syn/')
+    os.chdir(config.HOME_DIR + 'lib/dc/bes_data/syn/')
     # os.system('rm -rf log/*.log')
     # os.system('rm -rf out/*.txt')
-    os.chdir(cicd_config.HOME_DIR)
+    os.chdir(config.HOME_DIR)
 
 
 def run_vcs():
@@ -224,7 +224,7 @@ def run_main():
         is_vcs_right = run_vcs()
         if is_vcs_right:
             run_dc()
-        cicd_config.git_commit(cicd_config.RPT_DIR, '[bot] new report!', True)
+        config.git_commit(config.RPT_DIR, '[bot] new report!', True)
 
 
 def run_dc():
@@ -233,13 +233,13 @@ def run_dc():
     os.system('cp lib/vcs/cpu/' + dut_core + '.v lib/vcs/cpu_dc/')
     os.chdir('lib/vcs/script')
     os.system('/autowire_new.py')
-    os.chdir(cicd_config.HOME_DIR)
+    os.chdir(config.HOME_DIR)
     os.chdir('lib/dc/bes_data/syn/scr/')
     os.system('./syn_scr_update')
     os.system('cp ../out/dc_report ' + rpt_home)
     clean_dc_env()
     clean_vcs_env()  # can not move into run_vcs!
-    os.chdir(cicd_config.HOME_DIR)
+    os.chdir(config.HOME_DIR)
 
 
 def main():

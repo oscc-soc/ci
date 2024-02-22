@@ -1,7 +1,7 @@
 #!/bin/python
 from enum import Enum
 import os
-import cicd_config
+import config
 
 
 class LogState(Enum):
@@ -28,35 +28,35 @@ class VcsTest(object):
         self.clear_dir()
 
     def clear_dir(self):
-        cmd = f'cd {cicd_config.VCS_RUN_DIR}  && make clean'
+        cmd = f'cd {config.VCS_RUN_DIR}  && make clean'
         cmd += ' && rm temp.fp getReg* novas* verdi* -rf'
         os.system(cmd)
-        cmd = f'find {cicd_config.VCS_CPU_DIR}/*'
+        cmd = f'find {config.VCS_CPU_DIR}/*'
         cmd += ' grep -v ysyx_210000.v | xargs rm -rf'
         os.system(cmd)
 
     def intg_soc(self):
-        core_path = cicd_config.SUB_DIR + '/' + self.dut
+        core_path = config.SUB_DIR + '/' + self.dut
         sv_format = core_path + '.sv'
         v_format = core_path + '.sv'
         if os.path.isfile(sv_format):
-            os.system(f'cp {sv_format} {cicd_config.VCS_CPU_DIR}')
+            os.system(f'cp {sv_format} {config.VCS_CPU_DIR}')
         elif os.path.isfile(v_format):
-            os.system(f'cp {v_format} {cicd_config.VCS_CPU_DIR}')
+            os.system(f'cp {v_format} {config.VCS_CPU_DIR}')
         else:
             print('not found core!')
 
-        os.chdir(cicd_config.VCS_SCRIPT_DIR)
+        os.chdir(config.VCS_SCRIPT_DIR)
         os.system('python autowire.py')
-        os.chdir(cicd_config.HOME_DIR)
+        os.chdir(config.HOME_DIR)
 
     def comp(self):
-        cmd = f'cd {cicd_config.VCS_RUN_DIR} && make comp'
+        cmd = f'cd {config.VCS_RUN_DIR} && make comp'
         os.system(cmd)
 
         log_state = [LogState.end, LogState.end, LogState.end]
         # NOTE: receive comp log
-        with open(cicd_config.VCS_RUN_DIR + '/compile.log',
+        with open(config.VCS_RUN_DIR + '/compile.log',
                   'r',
                   encoding='utf-8') as fp:
             for line in fp:
@@ -78,12 +78,12 @@ class VcsTest(object):
 
     def run(self):
         # err_cnt = 0
-        cmd = f'cd {cicd_config.VCS_RUN_DIR} && '
+        cmd = f'cd {config.VCS_RUN_DIR} && '
         cmd += 'make all_test'
         os.system(cmd)
 
     def gen_rpt(self):
-        rpt_path = cicd_config.RPT_DIR + '/' + self.dut
+        rpt_path = config.RPT_DIR + '/' + self.dut
         rpt_path += f'/{self.date}-{self.time}'
         os.system(f'mkdir -p {rpt_path}')
         with open(rpt_path + '/vcs_report', 'a+', encoding='utf-8') as fp:

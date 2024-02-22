@@ -1,7 +1,7 @@
 import os
 from typing import Any, Dict, Tuple
 import tomli
-import cicd_config
+import config
 from data_type import IvConfig, VerConfig, VcsConfig, DcConfig
 
 
@@ -17,7 +17,7 @@ class Config(object):
         pass
 
     def check_config(self, sid) -> Tuple[bool, str]:
-        core_dir = cicd_config.SUB_DIR + '/' + sid
+        core_dir = config.SUB_DIR + '/' + sid
         core_config_file = core_dir + '/def_config.toml'
         # core_config_file = 'def_config.toml'
         if os.path.isfile(core_config_file):
@@ -25,13 +25,13 @@ class Config(object):
                 res = tomli.load(fp)
                 print(res)
 
-                cmd = f'git log origin/{cicd_config.BRANCH_NAME_DEV}'
+                cmd = f'git log origin/{config.BRANCH_NAME_DEV}'
                 cmd += ' --pretty=format:"%s" -1'
                 # print(cmd)
                 os.chdir(core_dir)
-                self.commit_info = cicd_config.exec_cmd(cmd)
+                self.commit_info = config.exec_cmd(cmd)
                 print(self.commit_info)
-                os.chdir(cicd_config.HOME_DIR)
+                os.chdir(config.HOME_DIR)
                 # self.commit_info = 'vcs'
                 # print(res.keys())
                 std_config_keys = ['iv_config', 'ver_config', 'vcs_config']
