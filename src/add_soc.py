@@ -34,13 +34,13 @@ class Cores(object):
 
     def handle_err(self, val: str):
         # NOTE: need to write to the submit info
-        print(f'ID: error format, the err val: {val}')
+        logging.info(msg=f'ID: error format, the err val: {val}')
 
     def add(self):
         with open(config.SUBMIT_LIST_PATH, 'r+', encoding='utf-8') as fp:
             for v in fp.readlines():
                 tmp = v.split()
-                print(tmp[1])
+                logging.debug(msg=tmp[1])
                 if self.check_valid(tmp[1]) != '':
                     self.fill_data(tmp)
                 else:
@@ -49,16 +49,15 @@ class Cores(object):
     # update the core list
     def update(self):
         os.chdir(config.SUBMIT_DIR)
-        # os.system('git checkout ' + config.CUR_BRAN)
-        # print(f'git checkout {config.CUR_BRAN}')
+        os.system('git checkout ' + config.CUR_BRAN)
+        logging.info(msg=f'git checkout {config.CUR_BRAN}')
         with open(config.CORE_LIST_PATH, 'r+', encoding='utf-8') as fp:
             for v in fp.readlines():
                 tmp = v.split()
-                # print('id: ' + val)
                 # filter err and spaces
                 if self.check_valid(tmp[0]) != '':
                     self.core_list.append(CoreInfo('', tmp[0]))
-                # print('id: ' + v.rstrip('\n'))
+                logging.debug(msg=f'id: {tmp[0]}')
 
         self.core_list.sort(key=lambda v: v.sid)
         self.submit_list.sort(key=lambda v: v.sid)
@@ -73,13 +72,13 @@ class Cores(object):
 
             if is_find is False:
                 os.system(f'git clone {va.url} submit/{va.sid}')
-                # print(f'git clone {va.url} submit/{va.sid}')
+                logging.debug(msg=f'git clone {va.url} submit/{va.sid}')
                 new_id.append(CoreInfo('', va.sid, 'F'))
 
-        print(f'new core num: {len(new_id)}')
+        logging.debug(msg=f'new core num: {len(new_id)}')
         self.core_list += new_id
         self.core_list.sort(key=lambda v: v.sid)
-        # print(self.core_list)
+        logging.debug(msg=self.core_list)
         with open(config.CORE_LIST_PATH, 'w+', encoding='utf-8') as fp:
             for v in self.core_list:
                 fp.write(v.sid + ' ' + v.flag + '\n')
@@ -89,17 +88,11 @@ cores = Cores()
 
 
 def main():
-    logging.basicConfig(filename=config.RUN_LOG_PATH, filemode='w', format='%(asctime)s %(name)s:%(levelname)s:%(message)s', datefmt='%Y-%M-%d %H:%M:%S', level=logging.DEBUG)
-    logging.info('[add soc]')
-    logging.debug('This is a debug message')
-    logging.warning('This is a warning message')
-    logging.error('This is an error message')
-    logging.critical('This is a critical message')
-
+    logging.info(msg='[add soc]')
     os.system(f'mkdir -p {config.DATA_DIR}')
-    # cores.clear()
-    # cores.add()
-    # cores.update()
+    cores.clear()
+    cores.add()
+    cores.update()
 
 
 if __name__ == '__main__':

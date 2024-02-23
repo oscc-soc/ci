@@ -1,9 +1,9 @@
 #!/bin/python
 
 import time
-import config
 import logging
 import schedule
+import config
 import add_soc
 import repo_update
 import dispatch
@@ -18,13 +18,17 @@ import dispatch
 # toml, database
 def main_task():
     add_soc.main()
-    # repo_update.main()
+    repo_update.main()
     # dispatch.main()
 
 
-logging.basicConfig(filename=config.RUN_LOG_PATH, filemode='w',
+# prio level: DEBUG < INFO < WARNING < ERROR < CRITICAL
+# logging print message which greater than prio level
+logging.basicConfig(filename=config.RUN_LOG_PATH, filemode='a',
                     format='%(asctime)s %(name)s:%(levelname)s:%(message)s',
                     datefmt='%Y-%M-%d %H:%M:%S', level=logging.DEBUG)
+
+logging.info('\n=====NEW LOG======\n') #TODO: add start screen
 schedule.every(1).seconds.do(main_task)
 
 while True:
