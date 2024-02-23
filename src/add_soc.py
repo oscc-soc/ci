@@ -2,12 +2,14 @@
 
 import os
 import re
+import logging
 from typing import List
 import config
 from data_type import CoreInfo
 
 
 class Cores(object):
+
     def __init__(self):
         self.submit_list = []
         self.core_list = []
@@ -48,7 +50,7 @@ class Cores(object):
     def update(self):
         os.chdir(config.SUBMIT_DIR)
         # os.system('git checkout ' + config.CUR_BRAN)
-        print(f'git checkout {config.CUR_BRAN}')
+        # print(f'git checkout {config.CUR_BRAN}')
         with open(config.CORE_LIST_PATH, 'r+', encoding='utf-8') as fp:
             for v in fp.readlines():
                 tmp = v.split()
@@ -70,8 +72,8 @@ class Cores(object):
                     break
 
             if is_find is False:
-                # os.system(f'git clone {va.url} submit/{va.sid}')
-                print(f'git clone {va.url} submit/{va.sid}')
+                os.system(f'git clone {va.url} submit/{va.sid}')
+                # print(f'git clone {va.url} submit/{va.sid}')
                 new_id.append(CoreInfo('', va.sid, 'F'))
 
         print(f'new core num: {len(new_id)}')
@@ -87,10 +89,17 @@ cores = Cores()
 
 
 def main():
-    print('[add soc]')
-    cores.clear()
-    cores.add()
-    cores.update()
+    logging.basicConfig(filename=config.RUN_LOG_PATH, filemode='w', format='%(asctime)s %(name)s:%(levelname)s:%(message)s', datefmt='%Y-%M-%d %H:%M:%S', level=logging.DEBUG)
+    logging.info('[add soc]')
+    logging.debug('This is a debug message')
+    logging.warning('This is a warning message')
+    logging.error('This is an error message')
+    logging.critical('This is a critical message')
+
+    os.system(f'mkdir -p {config.DATA_DIR}')
+    # cores.clear()
+    # cores.add()
+    # cores.update()
 
 
 if __name__ == '__main__':

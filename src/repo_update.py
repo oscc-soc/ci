@@ -7,6 +7,7 @@ from data_type import CoreInfo, QueueInfo
 
 
 class CoreQueue(object):
+
     def __init__(self):
         self.val_list = []
 
@@ -50,8 +51,8 @@ class CoreQueue(object):
         # print(date_rev)
         date_rev = config.exec_cmd(cmd)
 
-        std_date = datetime.strptime(
-            date_rev, config.GMT_FORMAT).strftime(config.STD_FOMRAT)
+        std_date = datetime.strptime(date_rev, config.GMT_FORMAT).strftime(
+            config.STD_FOMRAT)
 
         os.chdir(config.HOME_DIR)
         print(submod_name + ':')
@@ -133,7 +134,7 @@ def main():
     print('[repo update]')
     core_queue.clear()
     core_queue.check_id()
-    core_queue.update_queue()
+    # core_queue.update_queue()
 
 
 if __name__ == '__main__':

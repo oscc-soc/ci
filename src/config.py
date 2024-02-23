@@ -13,6 +13,7 @@ DATA_DIR = HOME_DIR + '../data/' + CUR_BRAN
 SUBMIT_LIST_PATH = DATA_DIR + '/submit_list'
 CORE_LIST_PATH = DATA_DIR + '/core_list'
 QUEUE_LIST_PATH = DATA_DIR + '/queue_list'
+RUN_LOG_PATH = DATA_DIR + '/run.log'
 
 DC_HOME_DIR = HOME_DIR + '../lib/dc/bes_data/syn/scr'
 DC_LOG_DIR = DC_HOME_DIR + '../log'
