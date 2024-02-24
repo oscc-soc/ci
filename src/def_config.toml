@@ -1,27 +1,36 @@
 # This is the default submit config
+# NOTE: below config if have bracket in line comment, that mean 
+# this config only supports string in bracket, other words dont support!
+
 [meta]
 project = "demo"
 author  = "Ben"
 version = "1.0"
 
-[core]
-name     = "ysyx_xxxxxxxx.v" # core name
-top      = "ysyx_xxxxxxxx"   # top name
-clk_name = "clk"             # top clock signal name
+[dut]
+file        = "ysyx_xxxxxxxx.v" # dut file name TODO: support filelist
+top         = "ysyx_xxxxxxxx"   # top module name
+clk         = "clk"             # top clock signal name
+commit      = ""                # support ["", "vcs", "dc"] leave a blank mean
+                                # test vcs+dc, otherwise ci only run specific test 
+                                # which commit equal below testsuit's commit_flag.
+                                # Now iverilog and verilator test are not supported.
+                                # example: commit == "dc" mean only run dc test
 
 [iverilog]
-commit_info = "iv"
+commit_flag = "iv"
 
 [verilator]
-commit_info = "ver"
+commit_flag = "ver"
 
 [vcs]
-commit_info = "vcs"
+commit_flag = "vcs"
+freq        = 25
 prog        = 'all'  # format: [prog]-[type] prog: [hello, memtest, rtthread] type: [flash, mem, sdram]
 debug       = {wave = "off", prog = "hello-flash"}
 
 [dc]
-commit_info = "dc"
+commit_flag = "dc"
 freq        = 100   # [100, 800, step: 50]
 corner      = "TYP" # [WCZ MAX WCL TYP MIN ML MZ]
-retiming    = "off" # [off on]
+retime      = "off" # [off on]

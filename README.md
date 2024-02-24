@@ -12,7 +12,7 @@
       <img alt="stars" src="https://img.shields.io/github/stars/oscc-soc/ci?color=blue&style=flat-square" />
     </a>
     <a href="https://github.com/oscc-soc/ci">
-      <img src="https://img.shields.io/tokei/lines/github/oscc-soc/ci?color=red&style=flat-square">
+      <img src="https://tokei.rs/b1/github/oscc-soc/ci?color=rosybrown&style=flat-square">
     </a>
     <a href="https://github.com/oscc-soc/ci">
       <img src="https://img.shields.io/badge/toolchain-python-red?style=flat-square">
