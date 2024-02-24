@@ -2,16 +2,16 @@ import os
 from typing import Any, Dict, Tuple
 import tomli
 import config
-from data_type import IvConfig, VerConfig, VcsConfig, DcConfig
+from data_type import IverilogConfig, VerilatorConfig, VCSConfig, DCConfig
 
 
 class Config(object):
     def __init__(self):
         self.commit_info = ''
-        self.iv = IvConfig()
-        self.ver = VerConfig()
-        self.vcs = VcsConfig(False, 'all', 100)
-        self.dc = DcConfig(100)
+        self.iv = IverilogConfig()
+        self.ver = VerilatorConfig()
+        self.vcs = VCSConfig(False, 'all', 100)
+        self.dc = DCConfig(100)
 
     def clear(self):
         pass

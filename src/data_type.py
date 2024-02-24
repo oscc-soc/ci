@@ -7,33 +7,73 @@ class CoreInfo(object):
         self.sid = sid
         self.flag = flag
 
+    def __str__(self) -> str:
+        return f'url: {self.url} sid: {self.sid} flag: {self.flag}'
+
 
 class QueueInfo(object):
     def __init__(self, sid: str, date: str):
         self.sid = sid
         self.date = date
 
-
-class IvConfig(object):
-    def __init__(self):
-        pass
+    def __str__(self) -> str:
+        return f'sid: {self.sid} date: {self.date}'
 
 
-class VerConfig(object):
-    def __init__(self):
-        pass
+class DUTConfig(object):
+    def __init__(self, file: str, top: str, clk: str):
+        self.file = file
+        self.clk = clk
+        self.top = top
+
+    def __str__(self) -> str:
+        return f'file: {self.file} clk: {self.clk} top: {self.top}'
 
 
-class VcsConfig(object):
-    def __init__(self, wave: bool, prog: str, freq: int):
+class IverilogConfig(object):
+    def __init__(self, commit: str):
+        self.commit = commit
+
+    def __str__(self) -> str:
+        return f'commit: {self.commit}'
+
+
+class VerilatorConfig(object):
+    def __init__(self, commit: str):
+        self.commit = commit
+
+    def __str__(self) -> str:
+        return f'commit: {self.commit}'
+
+
+class VCSConfig(object):
+    def __init__(self, freq: int, prog: str, wave: bool):
+        self.freq = freq
         self.wave = wave
         self.prog = prog
-        self.freq = freq
 
     def __str__(self) -> str:
         return f'wave: {self.wave} prog: {self.prog} freq: {self.freq}'
 
 
-class DcConfig(object):
-    def __init__(self, freq: int):
+class DCConfig(object):
+    def __init__(self, freq: int, corner: str, retime: bool):
         self.freq = freq
+        self.corner = corner
+        self.retime = retime
+
+    def __str__(self) -> str:
+        return f'freq: {self.freq} corner: {self.corner} retime: {self.retime}'
+
+
+class SubmitConfig(object):
+    def __init__(self, iv_cfg: IverilogConfig, ver_cfg: VerilatorConfig,
+                 vcs_cfg: VCSConfig, dc_cfg: DCConfig):
+        self.iv_cfg = iv_cfg
+        self.ver_cfg = ver_cfg
+        self.vcs_cfg = vcs_cfg
+        self.dc_cfg = dc_cfg
+
+    def __str__(self) -> str:
+        return f'''iv_cfg: {self.iv_cfg} ver_cfg: {self.ver_cfg}
+                   vcs_cfg: {self.vcs_cfg} dc_cfg: {self.dc_cfg}'''

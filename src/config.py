@@ -1,5 +1,6 @@
 #!/bin/python
 import os
+import logging
 
 BRANCH_NAME_DEV = 'master'
 
@@ -34,7 +35,7 @@ def exec_cmd(cmd: str) -> str:
     try:
         ret = os.popen(cmd).read()
     except Exception as e:
-        print(f"Error '{0}' occured when exec_cmd".format(e))
+        logging.exception(f"Error '{0}' occured when exec_cmd".format(e))
         ret = ''
     return ret
 

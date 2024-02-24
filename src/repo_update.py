@@ -1,5 +1,6 @@
 #!/bin/python
 import os
+import logging
 from datetime import datetime
 from typing import Tuple
 import config
@@ -22,10 +23,9 @@ class CoreQueue(object):
             return
         else:
             # switch to branch
-            print('switch to branch: ' + bran_name)
-            cmd = f'git checkout {bran_name}'
-            ret = config.exec_cmd(cmd)
-            print(ret)
+            logging.info(msg=f'switch to branch: {bran_name}')
+            ret = config.exec_cmd(f'git checkout {bran_name}')
+            logging.info(msg=ret)
 
     # return: (state: Bool, submod_name: str, std_date: str)
     # state: if submod repo has new commit
@@ -55,11 +55,11 @@ class CoreQueue(object):
             config.STD_FOMRAT)
 
         os.chdir(config.HOME_DIR)
-        print(submod_name + ':')
-        print(f'local is:       {local_rev}'.rstrip('\n'))
-        print(f'remote is:      {remote_rev}'.rstrip('\n'))
-        print(f'git info is:    {title_rev}')
-        print(f'commit time is: {std_date}')
+        logging.info(msg=submod_name + ':')
+        logging.info(msg=f'local is:       {local_rev}'.rstrip('\n'))
+        logging.info(msg=f'remote is:      {remote_rev}'.rstrip('\n'))
+        logging.info(msg=f'git info is:    {title_rev}')
+        logging.info(msg=f'commit time is: {std_date}')
         return (local_rev != remote_rev, std_date)
 
     def pull_repo(self, submod_name: str):
@@ -77,15 +77,15 @@ class CoreQueue(object):
         # ret = (True, '2022-08-18 09:05:40')
         # restart is also right
         if core_info.flag == 'F':
-            print(f'[{core_info.sid}] first! start pull...')
+            logging.info(msg=f'[{core_info.sid}] first! start pull...')
             self.pull_repo(core_info.sid)
             self.val_list.append(QueueInfo(core_info.sid, ret[1]))
         elif ret[0] is True:
-            print(f'[{core_info.sid}] changed!! start pull...')
+            logging.info(msg=f'[{core_info.sid}] changed!! start pull...')
             # self.pull_repo(core_info.sid)
             self.val_list.append(QueueInfo(core_info.sid, ret[1]))
         else:
-            print(f'[{core_info.sid}] not changed')
+            logging.info(msg=f'[{core_info.sid}] not changed')
 
     # os.chdir(config.HOME_DIR)
     # check if cores have been added to the cicd database
@@ -130,11 +130,11 @@ core_queue = CoreQueue()
 
 
 def main():
+    logging.info('[repo update]')
     os.system(f'mkdir -p {config.DATA_DIR}')
-    print('[repo update]')
     core_queue.clear()
     core_queue.check_id()
-    # core_queue.update_queue()
+    core_queue.update_queue()
 
 
 if __name__ == '__main__':
