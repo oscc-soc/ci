@@ -8,7 +8,6 @@ from data_type import CoreInfo, QueueInfo
 
 
 class CoreQueue(object):
-
     def __init__(self):
         self.val_list = []
 
@@ -72,14 +71,19 @@ class CoreQueue(object):
         print(ret)
         os.chdir(config.HOME_DIR)
 
+    # check if config is valid and parse the config
+    def parse_cfg(self):
+        pass
+
+    # check if remote repo has been updated
     def check_repo(self, core_info: CoreInfo):
         ret = self.check_remote_update(core_info.sid)
-        # ret = (True, '2022-08-18 09:05:40')
         # restart is also right
         if core_info.flag == 'F':
             logging.info(msg=f'[{core_info.sid}] first! start pull...')
             self.pull_repo(core_info.sid)
             self.val_list.append(QueueInfo(core_info.sid, ret[1]))
+            
         elif ret[0] is True:
             logging.info(msg=f'[{core_info.sid}] changed!! start pull...')
             # self.pull_repo(core_info.sid)
@@ -87,7 +91,6 @@ class CoreQueue(object):
         else:
             logging.info(msg=f'[{core_info.sid}] not changed')
 
-    # os.chdir(config.HOME_DIR)
     # check if cores have been added to the cicd database
     def check_id(self):
         with open(config.CORE_LIST_PATH, 'r+', encoding='utf-8') as fp:

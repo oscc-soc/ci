@@ -40,6 +40,17 @@ def exec_cmd(cmd: str) -> str:
     return ret
 
 
+def repl_str(file, old_str, new_str):
+    file_data = ""
+    with open(file, "r", encoding="utf-8") as fp:
+        for line in fp:
+            if old_str in line:
+                line = line.replace(old_str, new_str)
+            file_data += line
+    with open(file, "w", encoding="utf-8") as fp:
+        fp.write(file_data)
+
+
 def git_commit(path, info, push=False):
     os.chdir(SUBMIT_DIR)
     os.system('git add ' + path)

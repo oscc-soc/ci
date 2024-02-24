@@ -21,10 +21,11 @@ class QueueInfo(object):
 
 
 class DUTConfig(object):
-    def __init__(self, file: str, top: str, clk: str):
+    def __init__(self, file: str, top: str, clk: str, commit: str):
         self.file = file
-        self.clk = clk
         self.top = top
+        self.clk = clk
+        self.commit = commit
 
     def __str__(self) -> str:
         return f'file: {self.file} clk: {self.clk} top: {self.top}'
@@ -67,8 +68,10 @@ class DCConfig(object):
 
 
 class SubmitConfig(object):
-    def __init__(self, iv_cfg: IverilogConfig, ver_cfg: VerilatorConfig,
-                 vcs_cfg: VCSConfig, dc_cfg: DCConfig):
+    def __init__(self, dut_cfg: DUTConfig, iv_cfg: IverilogConfig,
+                 ver_cfg: VerilatorConfig, vcs_cfg: VCSConfig,
+                 dc_cfg: DCConfig):
+        self.dut_cfg = dut_cfg
         self.iv_cfg = iv_cfg
         self.ver_cfg = ver_cfg
         self.vcs_cfg = vcs_cfg
