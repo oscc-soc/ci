@@ -2,6 +2,7 @@
 import os
 import logging
 from datetime import datetime
+import pickle
 from typing import Tuple
 import config
 import config_parser
@@ -11,9 +12,11 @@ from data_type import CoreInfo, QueueInfo
 class CoreQueue(object):
     def __init__(self):
         self.sub_list = []
+        self.old_sub_list = []
 
     def clear(self):
         self.sub_list.clear()
+        self.old_sub_list.clear()
 
     def sw_branch(self, bran_name: str):
         cmd = 'git symbolic-ref --short HEAD'
@@ -106,40 +109,41 @@ class CoreQueue(object):
 
     # check if cores have been added to the cicd database
     def check_id(self):
+        logging.info('[check id]')
         with open(config.CORE_LIST_PATH, 'r+', encoding='utf-8') as fp:
             for v in fp.readlines():
                 tmp = v.split()
                 self.check_repo(CoreInfo('', tmp[0], tmp[1]))
 
     def update_queue(self):
+        logging.info('[update queue]')
         # config.git_commit(config.SUB_DIR, '[bot] update repo')
-        # self.sub_list = [('ysyx_23050153', '2022-08-18 09:05:40'),
-        #          ('ysyx_23050340', '2022-08-18 09:00:38'),
-        #          ('ysyx_23050171', '2022-08-18 09:05:47')]
+        # self.sub_list = [('ysyx_23050153', '2022-08-18 09:05:40', sub_cfg),
+        #          ('ysyx_23050340', '2022-08-18 09:00:38', sub_cfg),
+        #          ('ysyx_23050171', '2022-08-18 09:05:47', sub_cfg)]
         self.sub_list.sort(key=lambda v: v.date)
-        with open(config.QUEUE_LIST_PATH, 'r+', encoding='utf-8') as fp:
-            fp_cores = fp.readlines()
-            # print(fp_cores)
-            # print(self.sub_list)
+        # check if queue list file exist
+        if os.path.isfile(config.QUEUE_LIST_PATH) is False:
+            with open(config.QUEUE_LIST_PATH, 'wb') as fp:
+                pickle.dump(self.sub_list, fp)
+            return
+
+        with open(config.QUEUE_LIST_PATH, 'rb') as fp:
+            self.old_sub_list = pickle.load(fp)
+            logging.info(msg=self.old_sub_list)
             # check if new-submit cores are in self.sub_list
-            for i, va in enumerate(fp_cores):
+            for i, va in enumerate(self.old_sub_list):
                 for j, vb in enumerate(self.sub_list):
-                    # print('va: ' + va.split()[0] + ' vb: ' + vb.sid)
-                    if va.split()[0] == vb.sid:
-                        fp_cores[i] = self.sub_list[
-                            j].sid + ' ' + self.sub_list[j].date + '\n'
+                    if va.sid == vb.sid:
+                        self.old_sub_list[i] = self.sub_list[j]
                         self.sub_list[j].sid = '@'
 
             for v in self.sub_list:
                 if v.sid != '@':
-                    fp_cores.append(v.sid + ' ' + v.date + '\n')
+                    self.old_sub_list.append(v)
 
-            # print(fp_cores)
-            # print(self.sub_list)
-            fp.seek(0)
-            fp.truncate(0)
-            fp.flush()
-            fp.writelines(fp_cores)
+        with open(config.QUEUE_LIST_PATH, 'wb') as fp:
+            pickle.dump(self.old_sub_list, fp)
 
 
 core_queue = CoreQueue()
@@ -150,7 +154,7 @@ def main():
     os.system(f'mkdir -p {config.DATA_DIR}')
     core_queue.clear()
     core_queue.check_id()
-    # core_queue.update_queue()
+    core_queue.update_queue()
 
 
 if __name__ == '__main__':
