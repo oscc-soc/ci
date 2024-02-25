@@ -26,8 +26,10 @@ commit_flag = "ver"
 [vcs]
 commit_flag = "vcs"
 freq        = 25
-prog        = 'all'  # format: [prog]-[type] prog: [hello, memtest, rtthread] type: [flash, mem, sdram]
-debug       = {wave = "off", prog = "hello-flash"}
+prog        = {name = "", type = ""} # format: [name]-[type] name: [hello, memtest, rtthread] type: [flash, mem, sdram]
+                                     # leave name item a blank mean test all programs
+wave        = "off"                  # [off on]
+
 
 [dc]
 commit_flag = "dc"
