@@ -1,5 +1,6 @@
 #!/bin/python
 
+from typing import Tuple
 
 class CoreInfo(object):
     def __init__(self, url: str, sid: str, flag='E'):
@@ -48,14 +49,13 @@ class VerilatorConfig(object):
 
 
 class VCSConfig(object):
-    def __init__(self, freq: int, prog: str, wave: bool):
+    def __init__(self, freq: int, prog: Tuple[str, str], wave: bool):
         self.freq = freq
-        self.wave = wave
         self.prog = prog
+        self.wave = wave
 
     def __str__(self) -> str:
-        return f'wave: {self.wave} prog: {self.prog} freq: {self.freq}'
-
+        return f'freq: {self.freq} prog: {self.prog} wave: {self.wave}'
 
 class DCConfig(object):
     def __init__(self, freq: int, corner: str, retime: bool):

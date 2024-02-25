@@ -12,7 +12,7 @@ class ConfigParser(object):
         self.def_dut = DUTConfig('', '', '', '')
         self.def_iv = IverilogConfig('')
         self.def_ver = VerilatorConfig('')
-        self.def_vcs = VCSConfig(25, 'all', False)
+        self.def_vcs = VCSConfig(25, ('', ''), False)
         self.def_dc = DCConfig(100, 'TYP', False)
         self.sub_cfg = SubmitConfig(self.def_dut, self.def_iv, self.def_ver,
                                     self.def_vcs, self.def_dc)
@@ -45,7 +45,89 @@ class ConfigParser(object):
         else:
             return (False, 'dut file dont exist')
 
-        return (False, 'file, top or clk cfg item value is wrong')
+        self.sub_cfg.dut_cfg.file = cfg_list['file']
+        self.sub_cfg.dut_cfg.top = cfg_list['top']
+        self.sub_cfg.dut_cfg.clk = cfg_list['clk']
+        return (True, 'file, top and clk check done with no error')
+
+    def check_freq(self, cfg_list: Dict[str, Any],
+                   tab: str) -> Tuple[bool, str]:
+        if cfg_list.get('freq') is None:
+            return (False, 'dont have freq cfg item')
+
+        freq = cfg_list['freq']
+        if isinstance(freq, str):
+            freq = int(freq)
+
+        if tab == 'vcs':
+            self.sub_cfg.vcs_cfg.freq = freq
+            return (True, 'freq check done with no error')
+        elif tab == 'dc':
+            # check if freq is in range [100, 800, step=50]
+            for val in range(100, 850, 50):
+                if val == freq:
+                    self.sub_cfg.dc_cfg.freq = freq
+                    return (True, 'freq check done with no error')
+
+        return (False, 'freq cfg item value is wrong')
+
+    def check_prog(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        if cfg_list.get('prog') is None:
+            return (False, 'dont have prog cfg item')
+
+        prog = cfg_list['prog']
+        if prog.get('name') is None:
+            return (False, 'dont have prog sub name cfg item')
+
+        if prog.get('type') is None:
+            return (False, 'dont have prog sub type cfg item')
+
+        test_name_list = ['hello', 'memtest', 'rtthread']
+        test_type_list = ['flash', 'mem', 'sdram']
+
+        for vn in test_name_list:
+            for vt in test_type_list:
+                if (vn == prog['name'] and vt == prog['type']):
+                    self.sub_cfg.vcs_cfg.prog = (prog['name'], prog['type'])
+                    return (True, 'prog check done with no error')
+
+        return (False, 'prog cfg item value is wrong')
+
+    def check_wave(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        if cfg_list.get('wave') is None:
+            return (False, 'dont have wave cfg item')
+
+        switch_list = ['off', 'on']
+        for v in switch_list:
+            if v == cfg_list['wave']:
+                self.sub_cfg.vcs_cfg.wave = cfg_list['wave']
+                return (True, 'wave check done with no error')
+
+        return (False, 'wave item value is wrong')
+
+    def check_corner(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        if cfg_list.get('corner') is None:
+            return (False, 'dont have corner cfg item')
+
+        corner_list = ['WCZ', 'MAX', 'WCL', 'TYP', 'MIN', 'ML', 'MZ']
+        for v in corner_list:
+            if v == cfg_list['corner']:
+                self.sub_cfg.dc_cfg.corner = cfg_list['corner']
+                return (True, 'corner check done with no error')
+
+        return (False, 'corner item value is wrong')
+
+    def check_retime(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        if cfg_list.get('retime') is None:
+            return (False, 'dont have retime cfg item')
+
+        switch_list = ['off', 'on']
+        for v in switch_list:
+            if v == cfg_list['retime']:
+                self.sub_cfg.dc_cfg.retime = cfg_list['retime']
+                return (True, 'retime check done with no error')
+
+        return (False, 'retime item value is wrong')
 
     def check_commit(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
         if cfg_list.get('commit') is None:
@@ -61,9 +143,8 @@ class ConfigParser(object):
         # check if git cmd is valid and equal to config toml value
         test_list = ['', 'vcs', 'dc']
         for v in test_list:
-            if self.sub_cfg.dut_cfg.commit == v and cfg_list[
-                    'commit_info'] == v:
-                return (True, self.sub_cfg.dut_cfg.commit)
+            if self.sub_cfg.dut_cfg.commit == v:
+                return (True, 'commit check done with no error')
         return (False, 'commit cfg item value is wrong')
 
     def check_dut(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
@@ -81,9 +162,39 @@ class ConfigParser(object):
         return (True, 'check dut cfg table done with no error')
 
     def check_vcs(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        if cfg_list.get('vcs') is None:
+            return (False, 'dont have vcs cfg table')
+
+        check_res = self.check_freq(cfg_list['vcs'], 'vcs')
+        if check_res[0] is False:
+            return check_res
+
+        check_res = self.check_prog(cfg_list['vcs'])
+        if check_res[0] is False:
+            return check_res
+
+        check_res = self.check_wave(cfg_list['vcs'])
+        if check_res[0] is False:
+            return check_res
+
         return (True, 'check vcs cfg table done with no error')
 
     def check_dc(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        if cfg_list.get('dc') is None:
+            return (False, 'dont have dc cfg table')
+
+        check_res = self.check_freq(cfg_list['dc'], 'dc')
+        if check_res[0] is False:
+            return check_res
+
+        check_res = self.check_corner(cfg_list['dc'])
+        if check_res[0] is False:
+            return check_res
+
+        check_res = self.check_retime(cfg_list['dc'])
+        if check_res[0] is False:
+            return check_res
+
         return (True, 'check dc cfg table done with no error')
 
     def check(self, sid) -> Tuple[bool, str]:
