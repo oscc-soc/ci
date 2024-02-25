@@ -221,48 +221,9 @@ class ConfigParser(object):
                     return check_res
 
                 os.chdir(config.HOME_DIR)
-                logging.info(msg=toml_cfg.keys())
-                std_config_keys = ['iv_config', 'ver_config', 'vcs_config']
-                is_valid = False
-                for v in std_config_keys:
-                    if v in toml_cfg.keys() and toml_cfg[v][
-                            'commit_info'] == self.sub_cfg.dut_cfg.commit:
-                        print(f'[read {v}]')
-                        is_valid = True
-                        self.config_parse(toml_cfg[v])
-                return (is_valid, self.sub_cfg.dut_cfg.commit)
+                return (True, 'parse config.toml with no error')
         else:
             return (False, 'config.toml dont exist')
-
-    def parse_dut_config(self):
-        pass
-
-    def parse_iv_config(self, cfg: Dict[str, Any]):
-        print(cfg)
-
-    def parse_ver_config(self, cfg: Dict[str, Any]):
-        print(cfg)
-
-    def parse_vcs_config(self, cfg: Dict[str, Any]):
-        # print(cfg)
-        self.vcs.wave = cfg['wave'] == 'on'
-        self.vcs.prog = cfg['prog']
-        self.vcs.freq = cfg['freq']
-        print(self.vcs)
-
-    def parse_dc_config(self, cfg: Dict[str, Any]):
-        print(cfg)
-        self.dc.freq = cfg['freq']
-
-    def parse(self, cfg: Dict[str, Any]):
-        if self.sub_cfg.dut_cfg.commit == 'iv':
-            self.parse_iv_config(cfg)
-        elif self.sub_cfg.dut_cfg.commit == 'ver':
-            self.parse_ver_config(cfg)
-        elif self.sub_cfg.dut_cfg.commit == 'vcs':
-            self.parse_vcs_config(cfg)
-        elif self.sub_cfg.dut_cfg.commit == 'dc':
-            self.parse_dc_config(cfg)
 
 
 cfg_parser = ConfigParser()
@@ -274,9 +235,8 @@ def main(sid: str) -> Tuple[bool, str]:
     toml_cfg = cfg_parser.check(sid)
     if toml_cfg[0]:
         logging.info(msg=toml_cfg[1])
-        cfg_parser.parse()
     else:
-        logging.warning(msg='cfg.toml is not found or commit info is error!')
+        logging.warning(msg='config.toml is not found or has some errors')
     return toml_cfg
 
 
