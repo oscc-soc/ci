@@ -38,9 +38,8 @@ class ConfigParser(object):
                 return (False, 'top module dont exist')
 
             # not check if clk signal is in top module
-            if config.find_str(
-                    cfg_list['file'],
-                    f'\\s*module\\s*{cfg_list["clk"]}\\s*,') is False:
+            if config.find_str(cfg_list['file'],
+                               f'\\s*{cfg_list["clk"]}\\s*,') is False:
                 return (False, 'clk signal in top module dont exist')
         else:
             return (False, 'dut file dont exist')
@@ -91,6 +90,10 @@ class ConfigParser(object):
                     self.sub_cfg.vcs_cfg.prog = (prog['name'], prog['type'])
                     return (True, 'prog check done with no error')
 
+        if prog['name'] == '':
+            self.sub_cfg.vcs_cfg.prog = ('all', 'all')
+            return (True, 'prog check done with no error')
+
         return (False, 'prog cfg item value is wrong')
 
     def check_wave(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
@@ -134,11 +137,13 @@ class ConfigParser(object):
             return (False, 'dont have commit cfg item')
 
         # exec git cmd to get commit info
-        cmd = f'git log origin/{config.BRANCH_NAME_DEV}'
-        cmd += ' --pretty=format:"%s" -1'
-        logging.info(msg=cmd)
-        self.sub_cfg.dut_cfg.commit = config.exec_cmd(cmd)
+        # cmd = f'git log origin/{config.BRANCH_NAME_DEV}'
+        # cmd += ' --pretty=format:"%s" -1'
+        # logging.info(msg=cmd)
+        # self.sub_cfg.dut_cfg.commit = config.exec_cmd(cmd)
+        self.sub_cfg.dut_cfg.commit = cfg_list['commit']
         logging.info(msg=self.sub_cfg.dut_cfg.commit)
+        # print(self.sub_cfg.dut_cfg.commit)
 
         # check if git cmd is valid and equal to config toml value
         test_list = ['', 'vcs', 'dc']
@@ -200,12 +205,12 @@ class ConfigParser(object):
     def check(self, sid) -> Tuple[bool, str]:
         core_dir = config.SUB_DIR + '/' + sid
         core_cfg_file = core_dir + '/config.toml'
+        logging.info(msg=core_cfg_file)
         # check if config toml exists
         if os.path.isfile(core_cfg_file):
             with open(core_cfg_file, 'rb') as fp:
                 toml_cfg = tomli.load(fp)
                 logging.info(msg=toml_cfg)
-
                 os.chdir(core_dir)
                 # check and parse config
                 check_res = self.check_dut(toml_cfg)
@@ -236,9 +241,9 @@ def main(sid: str) -> Tuple[bool, str]:
     if toml_cfg[0]:
         logging.info(msg=toml_cfg[1])
     else:
-        logging.warning(msg='config.toml is not found or has some errors')
+        logging.warning(msg=f'parse config.toml with errors: {toml_cfg[1]}')
     return toml_cfg
 
 
 if __name__ == '__main__':
-    main('')
+    main('ysyx_000000')

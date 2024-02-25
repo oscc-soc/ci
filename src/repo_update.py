@@ -83,10 +83,10 @@ class CoreQueue(object):
             logging.info(msg=f'[{core_info.sid}] first! start pull...')
             self.pull_repo(core_info.sid)
             self.val_list.append(QueueInfo(core_info.sid, ret[1]))
-            
+
         elif ret[0] is True:
             logging.info(msg=f'[{core_info.sid}] changed!! start pull...')
-            # self.pull_repo(core_info.sid)
+            self.pull_repo(core_info.sid)
             self.val_list.append(QueueInfo(core_info.sid, ret[1]))
         else:
             logging.info(msg=f'[{core_info.sid}] not changed')
