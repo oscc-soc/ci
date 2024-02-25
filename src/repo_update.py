@@ -4,15 +4,16 @@ import logging
 from datetime import datetime
 from typing import Tuple
 import config
+import config_parser
 from data_type import CoreInfo, QueueInfo
 
 
 class CoreQueue(object):
     def __init__(self):
-        self.val_list = []
+        self.sub_list = []
 
     def clear(self):
-        self.val_list.clear()
+        self.sub_list.clear()
 
     def sw_branch(self, bran_name: str):
         cmd = 'git symbolic-ref --short HEAD'
@@ -26,7 +27,7 @@ class CoreQueue(object):
             ret = config.exec_cmd(f'git checkout {bran_name}')
             logging.info(msg=ret)
 
-    # return: (state: Bool, submod_name: str, std_date: str)
+    # return: (state: bool, std_date: str)
     # state: if submod repo has new commit
     def check_remote_update(self, submod_name: str) -> (Tuple[bool, str]):
         os.chdir(config.SUB_DIR + '/' + submod_name)
@@ -82,12 +83,24 @@ class CoreQueue(object):
         if core_info.flag == 'F':
             logging.info(msg=f'[{core_info.sid}] first! start pull...')
             self.pull_repo(core_info.sid)
-            self.val_list.append(QueueInfo(core_info.sid, ret[1]))
+            parse_res = config_parser.main(core_info.sid)
+            if parse_res[0] is True:
+                self.sub_list.append(
+                    QueueInfo(core_info.sid, ret[1],
+                              config_parser.submit_config()))
+            else:
+                pass  # TODO: record the error to the submit
 
         elif ret[0] is True:
             logging.info(msg=f'[{core_info.sid}] changed!! start pull...')
             self.pull_repo(core_info.sid)
-            self.val_list.append(QueueInfo(core_info.sid, ret[1]))
+            parse_res = config_parser.main(core_info.sid)
+            if parse_res[0] is True:
+                self.sub_list.append(
+                    QueueInfo(core_info.sid, ret[1],
+                              config_parser.submit_config()))
+            else:
+                pass  # TODO: record the error to the submit
         else:
             logging.info(msg=f'[{core_info.sid}] not changed')
 
@@ -100,29 +113,29 @@ class CoreQueue(object):
 
     def update_queue(self):
         # config.git_commit(config.SUB_DIR, '[bot] update repo')
-        # self.val_list = [('ysyx_23050153', '2022-08-18 09:05:40'),
+        # self.sub_list = [('ysyx_23050153', '2022-08-18 09:05:40'),
         #          ('ysyx_23050340', '2022-08-18 09:00:38'),
         #          ('ysyx_23050171', '2022-08-18 09:05:47')]
-        self.val_list.sort(key=lambda v: v.date)
+        self.sub_list.sort(key=lambda v: v.date)
         with open(config.QUEUE_LIST_PATH, 'r+', encoding='utf-8') as fp:
             fp_cores = fp.readlines()
             # print(fp_cores)
-            # print(self.val_list)
-            # check if new-submit cores are in self.val_list
+            # print(self.sub_list)
+            # check if new-submit cores are in self.sub_list
             for i, va in enumerate(fp_cores):
-                for j, vb in enumerate(self.val_list):
+                for j, vb in enumerate(self.sub_list):
                     # print('va: ' + va.split()[0] + ' vb: ' + vb.sid)
                     if va.split()[0] == vb.sid:
-                        fp_cores[i] = self.val_list[
-                            j].sid + ' ' + self.val_list[j].date + '\n'
-                        self.val_list[j].sid = '@'
+                        fp_cores[i] = self.sub_list[
+                            j].sid + ' ' + self.sub_list[j].date + '\n'
+                        self.sub_list[j].sid = '@'
 
-            for v in self.val_list:
+            for v in self.sub_list:
                 if v.sid != '@':
                     fp_cores.append(v.sid + ' ' + v.date + '\n')
 
             # print(fp_cores)
-            # print(self.val_list)
+            # print(self.sub_list)
             fp.seek(0)
             fp.truncate(0)
             fp.flush()
@@ -137,7 +150,7 @@ def main():
     os.system(f'mkdir -p {config.DATA_DIR}')
     core_queue.clear()
     core_queue.check_id()
-    core_queue.update_queue()
+    # core_queue.update_queue()
 
 
 if __name__ == '__main__':

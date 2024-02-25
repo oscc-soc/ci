@@ -2,6 +2,7 @@
 
 from typing import Tuple
 
+
 class CoreInfo(object):
     def __init__(self, url: str, sid: str, flag='E'):
         self.url = url
@@ -10,15 +11,6 @@ class CoreInfo(object):
 
     def __str__(self) -> str:
         return f'url: {self.url} sid: {self.sid} flag: {self.flag}'
-
-
-class QueueInfo(object):
-    def __init__(self, sid: str, date: str):
-        self.sid = sid
-        self.date = date
-
-    def __str__(self) -> str:
-        return f'sid: {self.sid} date: {self.date}'
 
 
 class DUTConfig(object):
@@ -57,6 +49,7 @@ class VCSConfig(object):
     def __str__(self) -> str:
         return f'freq: {self.freq} prog: {self.prog} wave: {self.wave}'
 
+
 class DCConfig(object):
     def __init__(self, freq: int, corner: str, retime: bool):
         self.freq = freq
@@ -80,3 +73,13 @@ class SubmitConfig(object):
     def __str__(self) -> str:
         return f'''iv_cfg: {self.iv_cfg} ver_cfg: {self.ver_cfg}
                    vcs_cfg: {self.vcs_cfg} dc_cfg: {self.dc_cfg}'''
+
+
+class QueueInfo(object):
+    def __init__(self, sid: str, date: str, sub_cfg: SubmitConfig):
+        self.sid = sid
+        self.date = date
+        self.sub_cfg = sub_cfg
+
+    def __str__(self) -> str:
+        return f'sid: {self.sid} date: {self.date} sub_cfg: {self.sub_cfg}'

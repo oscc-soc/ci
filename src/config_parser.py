@@ -245,5 +245,9 @@ def main(sid: str) -> Tuple[bool, str]:
     return toml_cfg
 
 
+def submit_config() -> SubmitConfig:
+    return cfg_parser.sub_cfg
+
+
 if __name__ == '__main__':
     main('ysyx_000000')

@@ -6,7 +6,7 @@ import schedule
 import config
 import add_soc
 import repo_update
-import dispatch
+# import dispatch
 
 
 # func:
