@@ -1,5 +1,6 @@
 #!/bin/python
 import os
+import re
 import logging
 
 BRANCH_NAME_DEV = 'master'
@@ -40,18 +41,26 @@ def exec_cmd(cmd: str) -> str:
     return ret
 
 
-def repl_str(file, old_str, new_str):
-    file_data = ""
-    with open(file, "r", encoding="utf-8") as fp:
+def find_str(file: str, pat: str) -> True:
+    with open(file, 'r', encoding='utf-8') as fp:
         for line in fp:
-            if old_str in line:
-                line = line.replace(old_str, new_str)
+            if re.match(pat, line):
+                return True
+    return False
+
+
+def repl_str(file: str, old: str, pat: str):
+    file_data = ''
+    with open(file, 'r', encoding='utf-8') as fp:
+        for line in fp:
+            if old in line:
+                line = line.replace(old, pat)
             file_data += line
-    with open(file, "w", encoding="utf-8") as fp:
+    with open(file, 'w', encoding='utf-8') as fp:
         fp.write(file_data)
 
 
-def git_commit(path, info, push=False):
+def git_commit(path: str, info: str, push: bool = False):
     os.chdir(SUBMIT_DIR)
     os.system('git add ' + path)
     os.system('git commit -m "' + info + '"')

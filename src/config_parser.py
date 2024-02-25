@@ -21,40 +21,75 @@ class ConfigParser(object):
         self.sub_cfg = SubmitConfig(self.def_dut, self.def_iv, self.def_ver,
                                     self.def_vcs, self.def_dc)
 
-    def check_commit_info(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
-        if cfg_list.get('commit_info') is None:
-            return (False, 'dont have commit_info cfg')
+    def check_file_top_clk(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        if cfg_list.get('file') is None:
+            return (False, 'dont have file cfg item')
+        if cfg_list.get('top') is None:
+            return (False, 'dont have top cfg item')
+        if cfg_list.get('clk') is None:
+            return (False, 'dont have clk cfg item')
 
+        # check if dut file exists
+        if os.path.isfile(cfg_list['file']):
+            if config.find_str(
+                    cfg_list['file'],
+                    f'\\s*module\\s*{cfg_list["top"]}\\s*[\\(\\)|\\(|\\s*]'
+            ) is False:
+                return (False, 'top module dont exist')
+
+            # not check if clk signal is in top module
+            if config.find_str(
+                    cfg_list['file'],
+                    f'\\s*module\\s*{cfg_list["clk"]}\\s*,') is False:
+                return (False, 'clk signal in top module dont exist')
+        else:
+            return (False, 'dut file dont exist')
+
+        return (False, 'file, top or clk cfg item value is wrong')
+
+    def check_commit(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        if cfg_list.get('commit') is None:
+            return (False, 'dont have commit cfg item')
+
+        # exec git cmd to get commit info
         cmd = f'git log origin/{config.BRANCH_NAME_DEV}'
         cmd += ' --pretty=format:"%s" -1'
         logging.info(msg=cmd)
-        self.commit_info = config.exec_cmd(cmd)
-        logging.info(msg=self.commit_info)
+        self.sub_cfg.dut_cfg.commit = config.exec_cmd(cmd)
+        logging.info(msg=self.sub_cfg.dut_cfg.commit)
 
+        # check if git cmd is valid and equal to config toml value
         test_list = ['', 'vcs', 'dc']
         for v in test_list:
-            if self.commit_info == v and cfg_list['commit_info'] == v:
-                return (True, self.commit_info)
-        return (False, 'dont have right commit info')
+            if self.sub_cfg.dut_cfg.commit == v and cfg_list[
+                    'commit_info'] == v:
+                return (True, self.sub_cfg.dut_cfg.commit)
+        return (False, 'commit cfg item value is wrong')
 
     def check_dut(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        if cfg_list.get('dut') is None:
+            return (False, 'dont have dut cfg table')
+
+        check_res = self.check_file_top_clk(cfg_list['dut'])
+        if check_res[0] is False:
+            return check_res
         # check and parse commit_info
-        check_res = self.check_commit_info(cfg_list)
+        check_res = self.check_commit(cfg_list['dut'])
         if check_res[0] is False:
             return check_res
 
-        return (False, 'dont have right dut info')
+        return (True, 'check dut cfg table done with no error')
 
     def check_vcs(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
-        return (False, 'dont have right vcs cfg')
+        return (True, 'check vcs cfg table done with no error')
 
     def check_dc(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
-        return (False, 'dont have right dc cfg')
+        return (True, 'check dc cfg table done with no error')
 
     def check(self, sid) -> Tuple[bool, str]:
         core_dir = config.SUB_DIR + '/' + sid
         core_cfg_file = core_dir + '/config.toml'
-        # check if file is exist
+        # check if config toml exists
         if os.path.isfile(core_cfg_file):
             with open(core_cfg_file, 'rb') as fp:
                 toml_cfg = tomli.load(fp)
@@ -79,12 +114,12 @@ class ConfigParser(object):
                 std_config_keys = ['iv_config', 'ver_config', 'vcs_config']
                 is_valid = False
                 for v in std_config_keys:
-                    if v in toml_cfg.keys(
-                    ) and toml_cfg[v]['commit_info'] == self.commit_info:
+                    if v in toml_cfg.keys() and toml_cfg[v][
+                            'commit_info'] == self.sub_cfg.dut_cfg.commit:
                         print(f'[read {v}]')
                         is_valid = True
                         self.config_parse(toml_cfg[v])
-                return (is_valid, self.commit_info)
+                return (is_valid, self.sub_cfg.dut_cfg.commit)
         else:
             return (False, 'config.toml dont exist')
 
@@ -109,13 +144,13 @@ class ConfigParser(object):
         self.dc.freq = cfg['freq']
 
     def parse(self, cfg: Dict[str, Any]):
-        if self.commit_info == 'iv':
+        if self.sub_cfg.dut_cfg.commit == 'iv':
             self.parse_iv_config(cfg)
-        elif self.commit_info == 'ver':
+        elif self.sub_cfg.dut_cfg.commit == 'ver':
             self.parse_ver_config(cfg)
-        elif self.commit_info == 'vcs':
+        elif self.sub_cfg.dut_cfg.commit == 'vcs':
             self.parse_vcs_config(cfg)
-        elif self.commit_info == 'dc':
+        elif self.sub_cfg.dut_cfg.commit == 'dc':
             self.parse_dc_config(cfg)
 
 
