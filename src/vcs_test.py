@@ -1,7 +1,9 @@
 #!/bin/python
+
 from enum import Enum
 import os
 import config
+from data_type import VCSConfig
 
 
 class LogState(Enum):
@@ -9,7 +11,7 @@ class LogState(Enum):
     end = 1
 
 
-class VcsTest(object):
+class VCSTest(object):
     def __init__(self):
         self.dut = ''
         self.date = ''
@@ -17,6 +19,7 @@ class VcsTest(object):
         self.lint = []
         self.warn = []
         self.err = []
+        self.vcs_cfg = VCSConfig(25, ('', ''), False)
 
     def clear(self):
         self.dut = ''
@@ -56,8 +59,7 @@ class VcsTest(object):
 
         log_state = [LogState.end, LogState.end, LogState.end]
         # NOTE: receive comp log
-        with open(config.VCS_RUN_DIR + '/compile.log',
-                  'r',
+        with open(config.VCS_RUN_DIR + '/compile.log', 'r',
                   encoding='utf-8') as fp:
             for line in fp:
                 if line[0:4] == 'Lint':
@@ -89,8 +91,7 @@ class VcsTest(object):
         with open(rpt_path + '/vcs_report', 'a+', encoding='utf-8') as fp:
             fp.writelines(f'\ncore: {self.dut}\n')
             fp.writelines(
-                '\n################\n#vcs compile log\n################\n'
-            )
+                '\n################\n#vcs compile log\n################\n')
 
             if not self.err or not self.warn or not self.lint:
                 fp.writelines('all clear\n\n')
@@ -98,17 +99,18 @@ class VcsTest(object):
                 fp.writelines(self.err + self.warn + self.lint)
 
 
-vcstest = VcsTest()
+vcstest = VCSTest()
 
 
-def main():
+def main(vcs_cfg: VCSConfig):
     print('[vcs test]')
     vcstest.clear()
+    vcstest.vcs_cfg = vcs_cfg
     vcstest.intg_soc()
     vcstest.comp()
     vcstest.run()
     vcstest.gen_rpt()
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+# main(None)

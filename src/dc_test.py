@@ -5,6 +5,7 @@ import re
 import time
 # import datetime
 import config
+from data_type import DCConfig
 
 freqlist = ['100']
 for freq in freqlist:
@@ -247,3 +248,7 @@ for freq in freqlist:
             # os.remove(warning_log2)
             # os.remove(area_rpt2)
             # os.remove(result_name)
+
+
+def main(sub_cfg: DCConfig):
+    return True
