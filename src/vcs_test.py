@@ -3,7 +3,8 @@
 from enum import Enum
 import os
 import config
-from data_type import VCSConfig
+import logging
+from data_type import DUTConfig, VCSConfig
 
 
 class LogState(Enum):
@@ -13,48 +14,46 @@ class LogState(Enum):
 
 class VCSTest(object):
     def __init__(self):
-        self.dut = ''
         self.date = ''
         self.time = ''
         self.lint = []
         self.warn = []
         self.err = []
+        self.dut_cfg = DUTConfig('', '', '', '')
         self.vcs_cfg = VCSConfig(25, ('', ''), False)
 
     def clear(self):
-        self.dut = ''
         self.date = ''
         self.time = ''
         self.lint = []
         self.warn = []
         self.err = []
-        self.clear_dir()
+        self.dut_cfg = DUTConfig('', '', '', '')
+        self.vcs_cfg = VCSConfig(25, ('', ''), False)
+        self.clear_env()
 
-    def clear_dir(self):
-        cmd = f'cd {config.VCS_RUN_DIR}  && make clean'
-        cmd += ' && rm temp.fp getReg* novas* verdi* -rf'
+    # clear test env
+    def clear_env(self):
+        os.chdir(config.VCS_RUN_DIR)
+        cmd = 'make clean && rm temp.fp getReg* novas* verdi* -rf'
         os.system(cmd)
-        cmd = f'find {config.VCS_CPU_DIR}/*'
-        cmd += ' grep -v ysyx_210000.v | xargs rm -rf'
+        os.chdir(config.VCS_CPU_DIR)
+        cmd = 'find *.v | grep -v ysyx_210000.v | xargs rm -rf'
         os.system(cmd)
+        os.chdir(config.HOME_DIR)
 
     def intg_soc(self):
-        core_path = config.SUB_DIR + '/' + self.dut
-        sv_format = core_path + '.sv'
-        v_format = core_path + '.sv'
-        if os.path.isfile(sv_format):
-            os.system(f'cp {sv_format} {config.VCS_CPU_DIR}')
-        elif os.path.isfile(v_format):
-            os.system(f'cp {v_format} {config.VCS_CPU_DIR}')
-        else:
-            print('not found core!')
+        os.chdir(config.VCS_CPU_DIR)
+        dut_path = config.SUB_DIR + '/' + self.dut_cfg.file
+        os.system(f'cp -rf {dut_path} .')
 
         os.chdir(config.VCS_SCRIPT_DIR)
         os.system('python autowire.py')
         os.chdir(config.HOME_DIR)
 
     def comp(self):
-        cmd = f'cd {config.VCS_RUN_DIR} && make comp'
+        os.chdir(config.VCS_RUN_DIR)
+        cmd = 'make comp'
         os.system(cmd)
 
         log_state = [LogState.end, LogState.end, LogState.end]
@@ -80,8 +79,8 @@ class VCSTest(object):
 
     def run(self):
         # err_cnt = 0
-        cmd = f'cd {config.VCS_RUN_DIR} && '
-        cmd += 'make all_test'
+        os.chdir(config.VCS_RUN_DIR)
+        cmd = 'make all_test'  # TODO: need to be modified by toml config
         os.system(cmd)
 
     def gen_rpt(self):
@@ -102,9 +101,10 @@ class VCSTest(object):
 vcstest = VCSTest()
 
 
-def main(vcs_cfg: VCSConfig):
+def main(dut_cfg: DUTConfig, vcs_cfg: VCSConfig):
     print('[vcs test]')
     vcstest.clear()
+    vcstest.dut_cfg = dut_cfg
     vcstest.vcs_cfg = vcs_cfg
     vcstest.intg_soc()
     vcstest.comp()
@@ -112,5 +112,5 @@ def main(vcs_cfg: VCSConfig):
     vcstest.gen_rpt()
 
 
-# if __name__ == '__main__':
-# main(None)
+if __name__ == '__main__':
+    main(DUTConfig('', '', '', ''), VCSConfig(25, ('', ''), False))
