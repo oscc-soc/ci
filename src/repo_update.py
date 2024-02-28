@@ -6,6 +6,7 @@ import pickle
 from typing import Tuple
 import config
 import config_parser
+import report
 from data_type import CoreInfo, QueueInfo
 
 
@@ -86,24 +87,30 @@ class CoreQueue(object):
         if core_info.flag == 'F':
             logging.info(msg=f'[{core_info.sid}] first! start pull...')
             self.pull_repo(core_info.sid)
+            report.create_dir(core_info.sid)
             parse_res = config_parser.main(core_info.sid)
             if parse_res[0] is True:
                 self.sub_list.append(
                     QueueInfo(core_info.sid, ret[1],
                               config_parser.submit_config()))
             else:
-                pass  # TODO: record the error to the submit
+                report.gen_state(core_info.sid, parse_res[1])
+                config.git_commit(config.RPT_DIR, '[bot] update state file',
+                                  True)
 
         elif ret[0] is True:
             logging.info(msg=f'[{core_info.sid}] changed!! start pull...')
             self.pull_repo(core_info.sid)
+            report.create_dir(core_info.sid)
             parse_res = config_parser.main(core_info.sid)
             if parse_res[0] is True:
                 self.sub_list.append(
                     QueueInfo(core_info.sid, ret[1],
                               config_parser.submit_config()))
             else:
-                pass  # TODO: record the error to the submit
+                report.gen_state(core_info.sid, parse_res[1])
+                config.git_commit(config.RPT_DIR, '[bot] update state file',
+                                  True)
         else:
             logging.info(msg=f'[{core_info.sid}] not changed')
 
@@ -117,10 +124,6 @@ class CoreQueue(object):
 
     def update_queue(self):
         logging.info('[update queue]')
-        # config.git_commit(config.SUB_DIR, '[bot] update repo')
-        # self.sub_list = [('ysyx_23050153', '2022-08-18 09:05:40', sub_cfg),
-        #          ('ysyx_23050340', '2022-08-18 09:00:38', sub_cfg),
-        #          ('ysyx_23050171', '2022-08-18 09:05:47', sub_cfg)]
         self.sub_list.sort(key=lambda v: v.date)
         # check if queue list file exist
         if os.path.isfile(config.QUEUE_LIST_PATH) is False:

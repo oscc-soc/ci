@@ -1,21 +1,13 @@
 #!/bin/python
 
-import os
+# import os
 import logging
 import pickle
 import config
-import config_parser
 # import iv_test
 # import ver_test
 import vcs_test
 import dc_test
-# import wave_test
-
-
-def create_dir(sid: str):
-    core_rpt_dir = config.RPT_DIR + '/' + sid
-    os.system(f'mkdir -p {core_rpt_dir}')
-    os.system(f'echo state: under test > {core_rpt_dir}/state')
 
 
 class Dispatch(object):

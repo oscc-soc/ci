@@ -2,8 +2,8 @@
 
 from enum import Enum
 import os
-import config
 import logging
+import config
 from data_type import DUTConfig, VCSConfig
 
 
@@ -78,10 +78,11 @@ class VCSTest(object):
                     self.err.append(line)
 
     def run(self):
-        # err_cnt = 0
         os.chdir(config.VCS_RUN_DIR)
-        cmd = 'make all_test'  # TODO: need to be modified by toml config
-        os.system(cmd)
+        if self.vcs_cfg.prog[0] == '':
+            os.system('make all-test')
+        else:
+            os.system(f'make {self.vcs_cfg.prog[0]}-{self.vcs_cfg.prog[1]}')
 
     def gen_rpt(self):
         rpt_path = config.RPT_DIR + '/' + self.dut
@@ -102,7 +103,7 @@ vcstest = VCSTest()
 
 
 def main(dut_cfg: DUTConfig, vcs_cfg: VCSConfig):
-    print('[vcs test]')
+    logging.info(msg='[vcs test]')
     vcstest.clear()
     vcstest.dut_cfg = dut_cfg
     vcstest.vcs_cfg = vcs_cfg
