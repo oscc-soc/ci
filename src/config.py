@@ -31,6 +31,14 @@ VCS_RUN_DIR = VCS_DIR + '/run'
 VCS_CPU_DIR = VCS_DIR + '/cpu'
 VCS_SCRIPT_DIR = VCS_DIR + '/script'
 
+TESTCASE_NAME_LIST = ['hello', 'memtest', 'rtthread']
+TESTCASE_TYPE_LIST = ['flash', 'mem', 'sdram']
+TESTCASE_RES_DICT = {
+    'hello': 'Hello World!',
+    'memtest': 'ALL TESTS PASSED!!',
+    'rtthread': 'Hello RISC-V'
+}
+
 
 def exec_cmd(cmd: str) -> str:
     try:

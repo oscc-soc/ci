@@ -81,11 +81,8 @@ class ConfigParser(object):
         if prog.get('type') is None:
             return (False, 'dont have prog sub type cfg item')
 
-        test_name_list = ['hello', 'memtest', 'rtthread']
-        test_type_list = ['flash', 'mem', 'sdram']
-
-        for vn in test_name_list:
-            for vt in test_type_list:
+        for vn in config.TESTCASE_NAME_LIST:
+            for vt in config.TESTCASE_TYPE_LIST:
                 if (vn == prog['name'] and vt == prog['type']):
                     self.sub_cfg.vcs_cfg.prog = (prog['name'], prog['type'])
                     return (True, 'prog check done with no error')

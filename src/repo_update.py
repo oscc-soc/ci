@@ -94,7 +94,7 @@ class CoreQueue(object):
                     QueueInfo(core_info.sid, ret[1],
                               config_parser.submit_config()))
             else:
-                report.gen_state(core_info.sid, parse_res[1])
+                report.gen_state(parse_res[1])
                 config.git_commit(config.RPT_DIR, '[bot] update state file',
                                   True)
 
@@ -108,7 +108,7 @@ class CoreQueue(object):
                     QueueInfo(core_info.sid, ret[1],
                               config_parser.submit_config()))
             else:
-                report.gen_state(core_info.sid, parse_res[1])
+                report.gen_state(parse_res[1])
                 config.git_commit(config.RPT_DIR, '[bot] update state file',
                                   True)
         else:
