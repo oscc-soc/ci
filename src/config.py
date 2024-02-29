@@ -16,20 +16,21 @@ SUBMIT_LIST_PATH = DATA_DIR + '/submit_list'
 CORE_LIST_PATH = DATA_DIR + '/core_list'
 QUEUE_LIST_PATH = DATA_DIR + '/queue_list'
 RUN_LOG_PATH = DATA_DIR + '/run.log'
-
-DC_HOME_DIR = HOME_DIR + '../lib/dc/bes_data/syn/scr'
-DC_LOG_DIR = DC_HOME_DIR + '../log'
-DC_RPT_DIR = DC_HOME_DIR + '../rpt'
 # NOTE: need to modify the SUBMIT_DIR path for the CICD repo
 # now just for test
 SUBMIT_DIR = HOME_DIR + '../tests/intg'
 SUB_DIR = SUBMIT_DIR + '/submit'
 RPT_DIR = SUBMIT_DIR + '/report'
-
+# vcs
 VCS_DIR = HOME_DIR + '../vcs'
 VCS_RUN_DIR = VCS_DIR + '/run'
 VCS_CPU_DIR = VCS_DIR + '/cpu'
 VCS_SCRIPT_DIR = VCS_DIR + '/script'
+# dc
+DC_SRC_DIR = HOME_DIR + '../lib/dc/bes_data/syn/scr'
+DC_CFG_DIR = HOME_DIR + '../lib/dc/bes_data/common'
+DC_LOG_DIR = DC_SRC_DIR + '../log'
+DC_RPT_DIR = DC_SRC_DIR + '../rpt'
 
 TESTCASE_NAME_LIST = ['hello', 'memtest', 'rtthread']
 TESTCASE_TYPE_LIST = ['flash', 'mem', 'sdram']

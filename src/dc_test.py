@@ -11,7 +11,7 @@ from data_type import DUTConfig, DCConfig
 
 freqlist = ['100']
 for freq in freqlist:
-    with open(config.DC_HOME_DIR + '/asic_top/ysyx_229998.tcl',
+    with open(config.DC_SRC_DIR + '/asic_top/ysyx_229998.tcl',
               encoding='utf-8') as fp:
         message = ''
         for line in fp:
@@ -19,7 +19,7 @@ for freq in freqlist:
                           'u0_rcg/u0_pll/CLK_OUT {freq_p}'.format(freq_p=freq),
                           line)
             message += line
-    with open(config.DC_HOME_DIR + '/asic_top/ysyx_229998.tcl',
+    with open(config.DC_SRC_DIR + '/asic_top/ysyx_229998.tcl',
               'w',
               encoding='utf-8') as fp:
         fp.write(message)
@@ -205,7 +205,7 @@ for freq in freqlist:
                 else:
                     fp.write('\n\nf=100Mhz FAIL!!!')
 
-            os.chdir(config.DC_HOME_DIR)
+            os.chdir(config.DC_SRC_DIR)
 
             with open(result_name, 'a', encoding='utf-8') as fp:
                 txt = '\n\n================AREA REPORT================\n\n'
@@ -252,8 +252,68 @@ for freq in freqlist:
             # os.remove(result_name)
 
 
-def main(dut_cfg: DUTConfig, sub_cfg: DCConfig):
-    logging.info(msg='[dc test]')
+class DCTest(object):
+    def __init__(self):
+        self.dut_cfg = DUTConfig('', '', '', '')
+        self.dc_cfg = DCConfig(100, 'TYP', False)
 
+    def clear(self):
+        os.chdir(config.DC_SRC_DIR)
+        os.system('cp -rf tm_run.sh run.sh')
+        os.chdir(config.DC_CFG_DIR)
+        os.system('cp -rf tm_read_hdl.tcl read_hdl.tcl')
+        os.chdir(config.DC_CFG_DIR)
+        os.system('cp -rf tm_config.tcl config.tcl')
+        os.chdir(config.HOME_DIR)
+
+    def set_para(self):
+        # config clk freq and corner
+        os.chdir(config.DC_SRC_DIR)
+        os.system(f'cp -rf template.tcl {self.dut_cfg.top}.tcl')
+        config.repl_str(f'{self.dut_cfg.top}.tcl', 'TEMPLATE_CLK',
+                        self.dut_cfg.clk)
+        config.repl_str(f'{self.dut_cfg.top}.tcl', 'TEMPLATE_FREQ',
+                        self.dc_cfg.freq)
+        config.repl_str('run.sh', 'TEMPLATE_TOP', self.dut_cfg.top)
+        config.repl_str('run.sh', 'TEMPLATE_CORNER', self.dc_cfg.corner)
+
+        # config retime
+        if self.dc_cfg.retime == 'on':
+            os.system(
+                'cp -rf flow_com/retime.tcl flow_com/syn_common_flow.tcl')
+        else:
+            os.system(
+                'cp -rf flow_com/no_retime.tcl flow_com/syn_common_flow.tcl')
+
+        # config hdl read path and top name
+        os.chdir(config.DC_CFG_DIR)
+        config.repl_str('read_hdl.tcl', 'TEMPLATE_DUT',
+                        f'$RTL_PATH/{self.dut_cfg.file}')
+        config.repl_str('read_hdl.tcl', 'TEMPLATE_TOP', self.dut_cfg.top)
+        config.repl_str('config.tcl', 'TEMPLATE_DUT',
+                        f'{config.SUB_DIR}/{self.dut_cfg.top}')
+        config.repl_str('config.tcl', 'TEMPLATE_TOP', self.dut_cfg.top)
+        os.chdir(config.HOME_DIR)
+
+    def run(self):
+        os.chdir(config.DC_SRC_DIR)
+        os.system('./run.sh')
+
+
+dctest = DCTest()
+
+
+def main(dut_cfg: DUTConfig, dc_cfg: DCConfig) -> bool:
+    logging.info(msg='[dc test]')
+    dctest.clear()
+    dctest.dut_cfg = dut_cfg
+    dctest.dc_cfg = dc_cfg
+    dctest.set_para()
+    dctest.run()
     
+
     return True
+
+
+if __name__ == '__main__':
+    main(DUTConfig('', '', '', ''), DCConfig(100, 'TYP', False))
