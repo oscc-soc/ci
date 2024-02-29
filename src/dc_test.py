@@ -3,6 +3,7 @@
 import os
 import re
 # import argparse
+import logging
 import time
 # import datetime
 import config
@@ -252,4 +253,7 @@ for freq in freqlist:
 
 
 def main(dut_cfg: DUTConfig, sub_cfg: DCConfig):
+    logging.info(msg='[dc test]')
+
+    
     return True

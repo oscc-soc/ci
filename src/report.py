@@ -3,7 +3,7 @@ import os
 import logging
 import config
 
-
+# helper class
 class Report(object):
     def __init__(self):
         self.dut_rpt_dir = ''

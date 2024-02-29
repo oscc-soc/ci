@@ -4,6 +4,7 @@
 import logging
 import pickle
 import config
+import report
 # import iv_test
 # import ver_test
 import vcs_test
@@ -25,6 +26,14 @@ class Dispatch(object):
 
         # pop first queue info and dispatch tasks
         sub_cfg = self.sub_list[0].sub_cfg
+        # update queue state info of other dut
+        for i, v in enumerate(self.sub_list):
+            report.create_dir(v.sub_cfg['dut']['top'])
+            if i == 0:
+                report.gen_state('under test')
+            else:
+                report.gen_state(f'wait {i} duts')
+
         # only dut pass vcs test, then it can be test by dc flow
         if sub_cfg.dut_cfg.commit == '':
             if vcs_test.main(sub_cfg['dut'], sub_cfg['vcs']) is True:
