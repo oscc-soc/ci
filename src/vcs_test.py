@@ -172,11 +172,12 @@ class VCSTest(object):
 vcstest = VCSTest()
 
 
-def main(date: str, time: str, dut_cfg: DUTConfig, vcs_cfg: VCSConfig) -> bool:
+def main(sub_date: str, sub_time: str, dut_cfg: DUTConfig,
+         vcs_cfg: VCSConfig) -> bool:
     logging.info(msg='[vcs test]')
     vcstest.clear()
-    vcstest.date = date
-    vcstest.time = time
+    vcstest.date = sub_date
+    vcstest.time = sub_time
     vcstest.dut_cfg = dut_cfg
     vcstest.vcs_cfg = vcs_cfg
     vcstest.intg_soc()
@@ -186,9 +187,7 @@ def main(date: str, time: str, dut_cfg: DUTConfig, vcs_cfg: VCSConfig) -> bool:
 
     if comp_res is True:
         vcstest.run()
-        run_info = vcstest.gen_run_rpt()
-        return run_info
-
+        return vcstest.gen_run_rpt()
     return comp_res
 
 

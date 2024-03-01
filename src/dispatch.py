@@ -40,11 +40,11 @@ class Dispatch(object):
         if sub_cfg.dut_cfg.commit == '':
             if vcs_test.main(sub_date, sub_time, sub_cfg['dut'],
                              sub_cfg['vcs']) is True:
-                dc_test.main(sub_cfg['dut'], sub_cfg['dc'])
+                dc_test.main(sub_date, sub_time, sub_cfg['dut'], sub_cfg['dc'])
         elif sub_cfg.dut_cfg.commit == 'vcs':
             vcs_test.main(sub_date, sub_time, sub_cfg['dut'], sub_cfg['vcs'])
         elif sub_cfg.dut_cfg.commit == 'dc':
-            dc_test.main(sub_cfg['dut'], sub_cfg['dc'])
+            dc_test.main(sub_date, sub_time, sub_cfg['dut'], sub_cfg['dc'])
 
         del self.sub_list[0]
         return True
