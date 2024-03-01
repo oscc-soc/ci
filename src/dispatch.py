@@ -26,6 +26,8 @@ class Dispatch(object):
 
         # pop first queue info and dispatch tasks
         sub_cfg = self.sub_list[0].sub_cfg
+        sub_date = self.sub_list[0].sub_date.split(' ')[0]
+        sub_time = self.sub_list[0].sub_date.split(' ')[1]
         # update queue state info of other dut
         for i, v in enumerate(self.sub_list):
             report.create_dir(v.sub_cfg['dut']['top'])
@@ -36,10 +38,11 @@ class Dispatch(object):
 
         # only dut pass vcs test, then it can be test by dc flow
         if sub_cfg.dut_cfg.commit == '':
-            if vcs_test.main(sub_cfg['dut'], sub_cfg['vcs']) is True:
+            if vcs_test.main(sub_date, sub_time, sub_cfg['dut'],
+                             sub_cfg['vcs']) is True:
                 dc_test.main(sub_cfg['dut'], sub_cfg['dc'])
         elif sub_cfg.dut_cfg.commit == 'vcs':
-            vcs_test.main(sub_cfg['dut'], sub_cfg['vcs'])
+            vcs_test.main(sub_date, sub_time, sub_cfg['dut'], sub_cfg['vcs'])
         elif sub_cfg.dut_cfg.commit == 'dc':
             dc_test.main(sub_cfg['dut'], sub_cfg['dc'])
 

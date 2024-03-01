@@ -118,7 +118,7 @@ class VCSTest(object):
             self.collect_run_log(self.vcs_cfg.prog[0], self.vcs_cfg.prog[1])
 
     def gen_rpt_dir(self) -> str:
-        rpt_path = config.RPT_DIR + '/' + self.dut_cfg.top
+        rpt_path = f'{config.RPT_DIR}/{self.dut_cfg.top}'
         rpt_path += f'/{self.date}-{self.time}'
         os.system(f'mkdir -p {rpt_path}')
         return rpt_path
@@ -172,9 +172,11 @@ class VCSTest(object):
 vcstest = VCSTest()
 
 
-def main(dut_cfg: DUTConfig, vcs_cfg: VCSConfig) -> bool:
+def main(date: str, time: str, dut_cfg: DUTConfig, vcs_cfg: VCSConfig) -> bool:
     logging.info(msg='[vcs test]')
     vcstest.clear()
+    vcstest.date = date
+    vcstest.time = time
     vcstest.dut_cfg = dut_cfg
     vcstest.vcs_cfg = vcs_cfg
     vcstest.intg_soc()
@@ -191,4 +193,4 @@ def main(dut_cfg: DUTConfig, vcs_cfg: VCSConfig) -> bool:
 
 
 if __name__ == '__main__':
-    main(DUTConfig('', '', '', ''), VCSConfig(25, ('', ''), False))
+    main('', '', DUTConfig('', '', '', ''), VCSConfig(25, ('', ''), False))

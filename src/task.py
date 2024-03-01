@@ -4,7 +4,7 @@ import time
 import logging
 import schedule
 import config
-import add_soc
+import add_dut
 import repo_update
 import dispatch
 
@@ -17,7 +17,7 @@ import dispatch
 # struct:
 # toml, database
 def main_task():
-    add_soc.main()
+    add_dut.main()
     repo_update.main()
     dispatch.main()
 

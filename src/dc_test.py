@@ -310,7 +310,6 @@ def main(dut_cfg: DUTConfig, dc_cfg: DCConfig) -> bool:
     dctest.dc_cfg = dc_cfg
     dctest.set_para()
     dctest.run()
-    
 
     return True
 
