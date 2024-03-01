@@ -84,12 +84,12 @@ class DCTest(object):
 
     def collect_area_rpt(self) -> str:
         res = '#####################\nAREA REPORT\n#####################\n'
-
+        # read area rpt and filter
         return res
 
     def collect_time_rpt(self) -> str:
         res = '#####################\nTIME REPORT\n#####################\n'
-
+        # read time rpt and filter
         return res
 
     def gen_run_rpt(self) -> bool:
@@ -101,6 +101,7 @@ class DCTest(object):
             fp.writelines(self.collect_area_rpt())
             fp.writelines(self.collect_time_rpt())
         return True
+
 
 dctest = DCTest()
 
