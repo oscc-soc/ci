@@ -32,6 +32,11 @@ wave        = "off"                  # [off on]
 
 [dc]
 flag        = "dc"                   # flag[dont use]
+process     = "28"                   # [110, 40, 28] [fixed value]
 freq        = 100                    # [100, 800, step: 50]
 corner      = "TYP"                  # [WCZ MAX WCL TYP MIN ML MZ]
+track       = "8T"                   # [8T ...] [dont use]
+volt_chnl   = "SVT40"                # voltage threshold and channel length secletion such as "SVT40+SVT35"
+                                     # or "SVT40+LVT35:0.3" to limit ration of LVT35
 retime      = "off"                  # [off on]
+user        = ""                     # [dont use]

@@ -16,6 +16,7 @@ class DCTest(object):
         self.time = ''
         self.dut_cfg = DUTConfig('', '', '', '')
         self.dc_cfg = DCConfig(100, 'TYP', False)
+        self.rpt_path = ''
 
     def clear(self):
         self.date = ''
@@ -71,6 +72,10 @@ class DCTest(object):
 
     def collect_syn_info(self) -> str:
         res = '#####################\nSYNTHESIS INFORMATION\n#####################\n'
+        res += f'top name: {self.dut_cfg.top}\n'
+        res += f'freq: {self.dc_cfg.freq}\n'
+        res += f'corner: {self.dc_cfg.corner}\n'
+        res += f'retime: {self.dc_cfg.retime}\n'
         return res
 
     def collect_run_log(self) -> str:
@@ -80,11 +85,29 @@ class DCTest(object):
     def collect_stat_rpt(self) -> str:
         res = '#####################\nSTATISTICS REPORT\n#####################\n'
 
+        with open(f'{self.rpt_path}/{self.dut_cfg.top}.statistics.rpt',
+                  'r',
+                  encoding='utf-8') as fp:
+            res = fp.read()
         return res
 
     def collect_area_rpt(self) -> str:
         res = '#####################\nAREA REPORT\n#####################\n'
         # read area rpt and filter
+        with open(f'{self.rpt_path}/{self.dut_cfg.top}.area.rpt',
+                  'r',
+                  encoding='utf-8') as fp:
+            block_filter = False
+            for line in fp:
+                if 'Number of ports' in line:
+                    block_filter = False
+
+                if 'Library(s) Used' in line:
+                    block_filter = True
+
+                if block_filter is False:
+                    res += line
+
         return res
 
     def collect_time_rpt(self) -> str:
@@ -114,6 +137,7 @@ def main(sub_date: str, sub_time: str, dut_cfg: DUTConfig,
     dctest.time = sub_time
     dctest.dut_cfg = dut_cfg
     dctest.dc_cfg = dc_cfg
+    dctest.rpt_path = f'{config.DC_RPT_DIR}/{dctest.dut_cfg.top}'
     dctest.set_para()
     dctest.run()
     return dctest.gen_run_rpt()
