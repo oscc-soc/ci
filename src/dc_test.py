@@ -2,10 +2,7 @@
 
 import os
 import re
-# import argparse
 import logging
-import time
-# import datetime
 import config
 from data_type import DUTConfig, DCConfig
 
@@ -14,6 +11,8 @@ class DCTest(object):
     def __init__(self):
         self.date = ''
         self.time = ''
+        self.err = []
+        self.warn = []
         self.dut_cfg = DUTConfig('', '', '', '')
         self.dc_cfg = DCConfig(100, 'TYP', False)
         self.rpt_path = ''
@@ -21,6 +20,8 @@ class DCTest(object):
     def clear(self):
         self.date = ''
         self.time = ''
+        self.err = []
+        self.warn = []
         self.dut_cfg = DUTConfig('', '', '', '')
         self.dc_cfg = DCConfig(25, ('', ''), False)
         os.chdir(config.DC_SRC_DIR)
@@ -80,6 +81,18 @@ class DCTest(object):
 
     def collect_run_log(self) -> str:
         res = '#####################\nRUN LOG\n#####################\n'
+        with open(f'{config.DC_RPT_DIR}/{self.dut_cfg.top}.log',
+                  'r',
+                  encoding='utf-8') as fp:
+            for line in fp:
+                if re.match('^Error:', line) is not None:
+                    self.err.append(line)
+                    res += line
+                if re.match('^Warning:', line) is not None:
+                    self.warn.append(line)
+                    res += line
+            res += f'****** Message Summary:{len(self.err)} Errors(s) '
+            res += f'{len(self.warn)} Warning(s) ******'
         return res
 
     def collect_stat_rpt(self) -> str:
@@ -99,7 +112,7 @@ class DCTest(object):
                   encoding='utf-8') as fp:
             block_filter = False
             for line in fp:
-                if 'Number of ports' in line:
+                if block_filter and 'Number of ports' in line:
                     block_filter = False
 
                 if 'Library(s) Used' in line:
@@ -113,6 +126,19 @@ class DCTest(object):
     def collect_time_rpt(self) -> str:
         res = '#####################\nTIME REPORT\n#####################\n'
         # read time rpt and filter
+        with open(f'{self.rpt_path}/{self.dut_cfg.top}.timing.rpt',
+                  'r',
+                  encoding='utf-8') as fp:
+            block_filter = False
+            for line in fp:
+                if 'Des/Clust/Port' in line:
+                    block_filter = True
+
+                if block_filter and 'Point' in line:
+                    block_filter = False
+
+                if block_filter is False and (not 'Library' in line):
+                    res += line
         return res
 
     def gen_run_rpt(self) -> bool:
