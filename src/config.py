@@ -11,26 +11,28 @@ STD_FOMRAT = '%Y-%m-%d %H:%M:%S'
 # CUR_BRAN = '202302'
 CUR_BRAN = 'main'  # NOTE: just for test
 HOME_DIR = os.getcwd() + '/'
-DATA_DIR = HOME_DIR + '../data/' + CUR_BRAN
-SUBMIT_LIST_PATH = DATA_DIR + '/submit_list'
-CORE_LIST_PATH = DATA_DIR + '/core_list'
-QUEUE_LIST_PATH = DATA_DIR + '/queue_list'
-RUN_LOG_PATH = DATA_DIR + '/run.log'
+DATA_DIR = f'{HOME_DIR}../data/CUR_BRAN'
+SUBMIT_LIST_PATH = f'{DATA_DIR}/submit_list'
+CORE_LIST_PATH = f'{DATA_DIR}/core_list'
+QUEUE_LIST_PATH = f'{DATA_DIR}/queue_list'
+RUN_LOG_PATH = f'{DATA_DIR}/run.log'
 # NOTE: need to modify the SUBMIT_DIR path for the CICD repo
 # now just for test
-SUBMIT_DIR = HOME_DIR + '../tests/intg'
-SUB_DIR = SUBMIT_DIR + '/submit'
-RPT_DIR = SUBMIT_DIR + '/report'
+SUBMIT_DIR = f'{HOME_DIR}../tests/intg'
+SUB_DIR = f'{SUBMIT_DIR}/submit'
+RPT_DIR = f'{SUBMIT_DIR}/report'
+WAVE_DIR = f'{HOME_DIR}../tests/wave'
+
 # vcs
-VCS_DIR = HOME_DIR + '../vcs'
-VCS_RUN_DIR = VCS_DIR + '/run'
-VCS_CPU_DIR = VCS_DIR + '/cpu'
-VCS_SCRIPT_DIR = VCS_DIR + '/script'
+VCS_DIR = f'{HOME_DIR}../vcs'
+VCS_RUN_DIR = f'{VCS_DIR}/run'
+VCS_CPU_DIR = f'{VCS_DIR}/cpu'
+VCS_SCRIPT_DIR = f'{VCS_DIR}/script'
 # dc
-DC_SRC_DIR = HOME_DIR + '../lib/dc/bes_data/syn/scr'
-DC_CFG_DIR = HOME_DIR + '../lib/dc/bes_data/common'
-DC_LOG_DIR = DC_SRC_DIR + '../log'
-DC_RPT_DIR = DC_SRC_DIR + '../rpt'
+DC_SRC_DIR = f'{HOME_DIR}../lib/dc/bes_data/syn/scr'
+DC_CFG_DIR = f'{HOME_DIR}../lib/dc/bes_data/common'
+DC_LOG_DIR = f'{DC_SRC_DIR}../log'
+DC_RPT_DIR = f'{DC_SRC_DIR}../rpt'
 
 TESTCASE_NAME_LIST = ['hello', 'memtest', 'rtthread']
 TESTCASE_TYPE_LIST = ['flash', 'mem', 'sdram']

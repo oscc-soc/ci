@@ -28,7 +28,7 @@ flag        = "vcs"                  # commit flag[dont use]
 freq        = 25
 prog        = {name = "", type = ""} # format: [name]-[type] name: [hello, memtest, rtthread] type: [flash, mem, sdram]
                                      # leave name item a blank mean test all programs
-wave        = "off"                  # [off on]
+wave        = "off"                  # [off on] note: wave option only valid when prog.name is not a blank and wave is "on"
 
 [dc]
 flag        = "dc"                   # flag[dont use]
