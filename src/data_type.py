@@ -4,9 +4,9 @@ from typing import Tuple
 
 
 class CoreInfo(object):
-    def __init__(self, url: str, sid: str, flag='E'):
+    def __init__(self, url: str, repo: str, flag='E'):
         self.url = url
-        self.sid = sid
+        self.repo = repo
         self.flag = flag
 
     def __str__(self) -> str:

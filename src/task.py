@@ -19,7 +19,7 @@ import dispatch
 def main_task():
     add_dut.main()
     repo_update.main()
-    dispatch.main()
+    # dispatch.main()
 
 
 # prio level: DEBUG < INFO < WARNING < ERROR < CRITICAL

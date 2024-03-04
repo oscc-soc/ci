@@ -67,7 +67,7 @@ class CoreQueue(object):
         return (local_rev != remote_rev, std_date)
 
     def pull_repo(self, submod_name: str):
-        os.chdir(config.SUB_DIR + '/' + submod_name)
+        os.chdir(f'{config.SUB_DIR}/{submod_name}')
         self.sw_branch(config.BRANCH_NAME_DEV)
 
         cmd = 'git pull --progress -v --no-rebase "origin" '
@@ -81,17 +81,17 @@ class CoreQueue(object):
         pass
 
     # check if remote repo has been updated
-    def check_repo(self, core_info: CoreInfo):
-        ret = self.check_remote_update(core_info.sid)
+    def check_repo(self, dut_info: CoreInfo):
+        ret = self.check_remote_update(dut_info.repo)
         # restart is also right
-        if core_info.flag == 'F':
-            logging.info(msg=f'[{core_info.sid}] first! start pull...')
-            self.pull_repo(core_info.sid)
-            report.create_dir(core_info.sid)
-            parse_res = config_parser.main(core_info.sid)
+        if dut_info.flag == 'F':
+            logging.info(msg=f'[{dut_info.repo}] first! start pull...')
+            self.pull_repo(dut_info.repo)
+            report.create_dir(dut_info.repo)
+            parse_res = config_parser.main(dut_info.repo)
             if parse_res[0] is True:
                 self.sub_list.append(
-                    QueueInfo(core_info.sid, ret[1],
+                    QueueInfo(dut_info.repo, ret[1],
                               config_parser.submit_config()))
             else:
                 report.gen_state(parse_res[1])
@@ -99,28 +99,28 @@ class CoreQueue(object):
                                   True)
 
         elif ret[0] is True:
-            logging.info(msg=f'[{core_info.sid}] changed!! start pull...')
-            self.pull_repo(core_info.sid)
-            report.create_dir(core_info.sid)
-            parse_res = config_parser.main(core_info.sid)
+            logging.info(msg=f'[{dut_info.repo}] changed!! start pull...')
+            self.pull_repo(dut_info.repo)
+            report.create_dir(dut_info.repo)
+            parse_res = config_parser.main(dut_info.repo)
             if parse_res[0] is True:
                 self.sub_list.append(
-                    QueueInfo(core_info.sid, ret[1],
+                    QueueInfo(dut_info.repo, ret[1],
                               config_parser.submit_config()))
             else:
                 report.gen_state(parse_res[1])
                 config.git_commit(config.RPT_DIR, '[bot] update state file',
                                   True)
         else:
-            logging.info(msg=f'[{core_info.sid}] not changed')
+            logging.info(msg=f'[{dut_info.repo}] not changed')
 
     # check if cores have been added to the cicd database
     def check_id(self):
         logging.info('[check id]')
-        with open(config.CORE_LIST_PATH, 'r+', encoding='utf-8') as fp:
-            for v in fp.readlines():
-                tmp = v.split()
-                self.check_repo(CoreInfo('', tmp[0], tmp[1]))
+        with open(config.DUT_LIST_PATH, 'r', encoding='utf-8') as fp:
+            for v in fp:
+                dut_info = v.split()
+                self.check_repo(CoreInfo('', dut_info[0], dut_info[1]))
 
     def update_queue(self):
         logging.info('[update queue]')
@@ -137,12 +137,12 @@ class CoreQueue(object):
             # check if new-submit cores are in self.sub_list
             for i, va in enumerate(self.old_sub_list):
                 for j, vb in enumerate(self.sub_list):
-                    if va.sid == vb.sid:
+                    if va.repo == vb.repo:
                         self.old_sub_list[i] = self.sub_list[j]
-                        self.sub_list[j].sid = '@'
+                        self.sub_list[j].repo = '@'
 
             for v in self.sub_list:
-                if v.sid != '@':
+                if v.repo != '@':
                     self.old_sub_list.append(v)
 
         with open(config.QUEUE_LIST_PATH, 'wb') as fp:

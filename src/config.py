@@ -11,9 +11,9 @@ STD_FOMRAT = '%Y-%m-%d %H:%M:%S'
 # CUR_BRAN = '202302'
 CUR_BRAN = 'main'  # NOTE: just for test
 HOME_DIR = os.getcwd() + '/'
-DATA_DIR = f'{HOME_DIR}../data/CUR_BRAN'
+DATA_DIR = f'{HOME_DIR}../data/{CUR_BRAN}'
 SUBMIT_LIST_PATH = f'{DATA_DIR}/submit_list'
-CORE_LIST_PATH = f'{DATA_DIR}/core_list'
+DUT_LIST_PATH = f'{DATA_DIR}/dut_list'
 QUEUE_LIST_PATH = f'{DATA_DIR}/queue_list'
 RUN_LOG_PATH = f'{DATA_DIR}/run.log'
 # NOTE: need to modify the SUBMIT_DIR path for the CICD repo

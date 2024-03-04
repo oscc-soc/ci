@@ -102,7 +102,14 @@ class VCSTest(object):
         wave_name = f'{self.dut_cfg.top}_{self.vcs_cfg.prog[0]}_{self.vcs_cfg.prog[1]}'
         os.system(f'fsdb2vcd asic_top.fsdb -o {wave_name}.vcd')
         os.system(f'vcd2fst -v {wave_name}.vcd -f {wave_name}.fst')
+        wave_path = self.gen_wave_dir()
+        os.system(f'cp -rf {wave_name}.fst {wave_path}')
+        os.chdir(wave_path)
+        
         os.chdir(config.HOME_DIR)
+
+    def clear_wave_rpt(self):
+        pass
 
     def comp(self):
         os.chdir(config.VCS_RUN_DIR)
@@ -138,6 +145,11 @@ class VCSTest(object):
         os.system(f'mkdir -p {rpt_path}')
         return rpt_path
 
+    def gen_wave_dir(self) -> str:
+        wave_path = f'{config.WAVE_DIR}/{self.dut_cfg.top}'
+        wave_path += f'/{self.date}-{self.time}'
+        os.system(f'mkdir -p {wave_path}')
+        return wave_path
 
     def gen_comp_rpt(self) -> bool:
         rpt_path = self.gen_rpt_dir()
