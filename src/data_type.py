@@ -10,7 +10,7 @@ class CoreInfo(object):
         self.flag = flag
 
     def __str__(self) -> str:
-        return f'url: {self.url} sid: {self.sid} flag: {self.flag}'
+        return f'url: {self.url} repo: {self.repo} flag: {self.flag}'
 
 
 class DUTConfig(object):

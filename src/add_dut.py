@@ -20,7 +20,7 @@ class DUT(object):
     # 2. pattern: ysyx_([0-9]{6})
     # 3. in id list
     def check_valid(self, val: str) -> bool:
-        return len(val) > 0
+        return len(val) > 3
         # if re.match('ysyx_[0-9]{8}', val) is not None:
         # return val
         # elif re.match('ysyx_[0-9]{6}', val) is not None:
@@ -38,12 +38,12 @@ class DUT(object):
     def add(self):
         with open(config.SUBMIT_LIST_PATH, 'r', encoding='utf-8') as fp:
             for url in fp:
-                repo_name = url.split('/')[-1]
-                logging.debug(msg=repo_name)
-                if self.check_valid(repo_name):
-                    self.fill_data(url, repo_name)
+                repo = url.rstrip('\n').split('/')[-1]
+                logging.debug(msg=repo)
+                if self.check_valid(repo):
+                    self.fill_data(url, repo)
                 else:
-                    self.handle_err(repo_name)
+                    self.handle_err(repo)
 
     # update the core list
     def update(self):
@@ -52,15 +52,16 @@ class DUT(object):
         logging.info(msg=f'git checkout {config.CUR_BRAN}')
         with open(config.DUT_LIST_PATH, 'r', encoding='utf-8') as fp:
             for v in fp:
-                repo_name = v.split()[0]
+                repo = v.rstrip('\n').split()[0]
                 # filter err and spaces
-                if self.check_valid(repo_name):
-                    self.dut_list.append(CoreInfo('', repo_name))
-                logging.debug(msg=f'repo name: {repo_name}')
+                if self.check_valid(repo):
+                    self.dut_list.append(CoreInfo('', repo))
+                logging.debug(msg=f'repo name: {repo}')
 
         self.dut_list.sort(key=lambda v: v.repo)
         self.new_dut_list.sort(key=lambda v: v.repo)
 
+        os.chdir(config.SUB_DIR)
         new_dut = []
         for va in self.new_dut_list:
             is_find = False
@@ -70,8 +71,8 @@ class DUT(object):
                     break
 
             if is_find is False:
-                os.system(f'git clone {va.url} submit/{va.repo}')
-                logging.debug(msg=f'git clone {va.url} submit/{va.repo}')
+                os.system(f'git clone {va.url} {va.repo}')
+                logging.debug(msg=f'git clone {va.url} {va.repo}')
                 new_dut.append(CoreInfo('', va.repo, 'F'))
 
         logging.debug(msg=f'new dut num: {len(new_dut)}')
