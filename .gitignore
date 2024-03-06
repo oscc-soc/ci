@@ -1,4 +1,6 @@
 data
+vcs
+dc
 tests
 
 # Byte-compiled / optimized / DLL files
