@@ -3,7 +3,7 @@
 from typing import Tuple
 
 
-class CoreInfo(object):
+class DUTInfo(object):
     def __init__(self, url: str, repo: str, flag='E'):
         self.url = url
         self.repo = repo

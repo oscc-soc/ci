@@ -2,19 +2,20 @@
 
 import os
 # import re
+import pickle
 import logging
 import config
-from data_type import CoreInfo
+from data_type import DUTInfo
 
 
 class DUT(object):
     def __init__(self):
-        self.new_dut_list = []
-        self.dut_list = []
+        self.all_dut_list = []
+        self.old_dut_list = []
 
     def clear(self):
-        self.new_dut_list.clear()
-        self.dut_list.clear()
+        self.all_dut_list.clear()
+        self.old_dut_list.clear()
 
     # 1. pattern: ysyx_([0-9]{8})
     # 2. pattern: ysyx_([0-9]{6})
@@ -29,7 +30,7 @@ class DUT(object):
         # return ''
 
     def fill_data(self, url: str, repo: str):
-        self.new_dut_list.append(CoreInfo(url, repo))
+        self.all_dut_list.append(DUTInfo(url, repo))
 
     def handle_err(self, val: str):
         # NOTE: need to write to the submit info
@@ -45,27 +46,26 @@ class DUT(object):
                 else:
                     self.handle_err(repo)
 
-    # update the core list
+    # update the dut list
     def update(self):
         os.chdir(config.SUBMIT_DIR)
         os.system(f'git checkout {config.CUR_BRAN}')
         logging.info(msg=f'git checkout {config.CUR_BRAN}')
-        with open(config.DUT_LIST_PATH, 'r', encoding='utf-8') as fp:
-            for v in fp:
-                repo = v.rstrip('\n').split()[0]
-                # filter err and spaces
-                if self.check_valid(repo):
-                    self.dut_list.append(CoreInfo('', repo))
-                logging.debug(msg=f'repo name: {repo}')
+        if os.path.isfile(config.DUT_LIST_PATH):
+            with open(config.DUT_LIST_PATH, 'rb') as fp:
+                self.old_dut_list = pickle.load(fp)
+                for v in self.old_dut_list:
+                    logging.debug(msg=f'load dut info: {v}')
 
-        self.dut_list.sort(key=lambda v: v.repo)
-        self.new_dut_list.sort(key=lambda v: v.repo)
+        self.old_dut_list.sort(key=lambda v: v.repo)
+        self.all_dut_list.sort(key=lambda v: v.repo)
 
         os.chdir(config.SUB_DIR)
-        new_dut = []
-        for va in self.new_dut_list:
+        all_dut = []
+        new_dut_num = 0
+        for va in self.all_dut_list:
             is_find = False
-            for vb in self.dut_list:
+            for vb in self.old_dut_list:
                 if va.repo == vb.repo:
                     is_find = True
                     break
@@ -73,15 +73,18 @@ class DUT(object):
             if is_find is False:
                 os.system(f'git clone {va.url} {va.repo}')
                 logging.debug(msg=f'git clone {va.url} {va.repo}')
-                new_dut.append(CoreInfo('', va.repo, 'F'))
+                all_dut.append(DUTInfo(va.url, va.repo, 'F'))
+                new_dut_num += 1
+            else:
+                all_dut.append(va)
+        logging.debug(
+            msg=f'all dut num: {len(all_dut)} new dut num: {new_dut_num}')
+        self.old_dut_list = all_dut
+        self.old_dut_list.sort(key=lambda v: v.repo)
+        # logging.debug(msg=self.old_dut_list)
 
-        logging.debug(msg=f'new dut num: {len(new_dut)}')
-        self.dut_list += new_dut
-        self.dut_list.sort(key=lambda v: v.repo)
-        logging.debug(msg=self.dut_list)
-        with open(config.DUT_LIST_PATH, 'w+', encoding='utf-8') as fp:
-            for v in self.dut_list:
-                fp.write(v.repo + ' ' + v.flag + '\n')
+        with open(config.DUT_LIST_PATH, 'wb') as fp:
+            pickle.dump(self.old_dut_list, fp)
 
 
 dut = DUT()

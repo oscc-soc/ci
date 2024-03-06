@@ -7,7 +7,7 @@ from typing import Tuple
 import config
 import config_parser
 import report
-from data_type import CoreInfo, QueueInfo
+from data_type import DUTInfo, QueueInfo
 
 
 class CoreQueue(object):
@@ -81,7 +81,7 @@ class CoreQueue(object):
         pass
 
     # check if remote repo has been updated
-    def check_repo(self, dut_info: CoreInfo):
+    def check_repo(self, dut_info: DUTInfo):
         ret = self.check_remote_update(dut_info.repo)
         # restart is also right
         if dut_info.flag == 'F':
@@ -120,7 +120,7 @@ class CoreQueue(object):
         with open(config.DUT_LIST_PATH, 'r', encoding='utf-8') as fp:
             for v in fp:
                 dut_info = v.split()
-                self.check_repo(CoreInfo('', dut_info[0], dut_info[1]))
+                self.check_repo(DUTInfo('', dut_info[0], dut_info[1]))
 
     def update_queue(self):
         logging.info('[update queue]')
