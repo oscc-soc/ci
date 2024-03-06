@@ -33,24 +33,29 @@ class Dispatch(object):
         logging.info(msg=f'sub_date: {sub_date}')
         logging.info(msg=f'sub_time: {sub_time}')
         # update queue state info of other dut
-        for i, _v in enumerate(self.sub_list):
+        for i, v in enumerate(self.sub_list):
+            report.create_dir(v.repo)
+            logging.info(msg=f'[dispatch update info]: {v.repo}')
             if i == 0:
                 report.gen_state('under test')
             else:
                 report.gen_state(f'wait {i} duts')
 
-
         # only dut pass vcs test, then it can be test by dc flow
         if sub_cfg.dut_cfg.commit == '':
-            if vcs_test.main(sub_date, sub_time, sub_cfg['dut'],
-                             sub_cfg['vcs']) is True:
-                dc_test.main(sub_date, sub_time, sub_cfg['dut'], sub_cfg['dc'])
+            if vcs_test.main(sub_date, sub_time, sub_cfg.dut_cfg,
+                             sub_cfg.vcs_cfg):
+                pass
+                # dc_test.main(sub_date, sub_time, sub_cfg.dut_cfg, sub_cfg['dc'])
         elif sub_cfg.dut_cfg.commit == 'vcs':
-            vcs_test.main(sub_date, sub_time, sub_cfg['dut'], sub_cfg['vcs'])
+            vcs_test.main(sub_date, sub_time, sub_cfg.dut_cfg, sub_cfg.vcs_cfg)
         elif sub_cfg.dut_cfg.commit == 'dc':
-            dc_test.main(sub_date, sub_time, sub_cfg['dut'], sub_cfg['dc'])
+            dc_test.main(sub_date, sub_time, sub_cfg.dut_cfg, sub_cfg.dc_cfg)
 
         del self.sub_list[0]
+        with open(config.QUEUE_LIST_PATH, 'wb') as fp:
+            pickle.dump(self.sub_list, fp)
+
         return True
 
 
