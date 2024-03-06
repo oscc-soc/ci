@@ -12,8 +12,8 @@ class Report(object):
 report = Report()
 
 
-def create_dir(sid: str):
-    report.dut_rpt_dir = config.RPT_DIR + '/' + sid
+def create_dir(repo: str):
+    report.dut_rpt_dir = config.RPT_DIR + '/' + repo
     os.system(f'mkdir -p {report.dut_rpt_dir}')
 
 

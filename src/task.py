@@ -18,7 +18,7 @@ import dispatch
 # toml, database
 def main_task():
     add_dut.main()
-    # repo_update.main()
+    repo_update.main()
     # dispatch.main()
 
 

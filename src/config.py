@@ -10,7 +10,7 @@ STD_FOMRAT = '%Y-%m-%d %H:%M:%S'
 
 # CUR_BRAN = '202302'
 CUR_BRAN = 'main'  # NOTE: just for test
-HOME_DIR = os.getcwd() + '/'
+HOME_DIR = f'{os.getcwd()}/'
 DATA_DIR = f'{HOME_DIR}../data/{CUR_BRAN}'
 SUBMIT_LIST_PATH = f'{DATA_DIR}/submit_list'
 DUT_LIST_PATH = f'{DATA_DIR}/dut_list'

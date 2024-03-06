@@ -199,8 +199,8 @@ class ConfigParser(object):
 
         return (True, 'check dc cfg table done with no error')
 
-    def check(self, sid) -> Tuple[bool, str]:
-        core_dir = config.SUB_DIR + '/' + sid
+    def check(self, repo) -> Tuple[bool, str]:
+        core_dir = config.SUB_DIR + '/' + repo
         core_cfg_file = core_dir + '/config.toml'
         logging.info(msg=core_cfg_file)
         # check if config toml exists
@@ -231,10 +231,10 @@ class ConfigParser(object):
 cfg_parser = ConfigParser()
 
 
-def main(sid: str) -> Tuple[bool, str]:
+def main(repo: str) -> Tuple[bool, str]:
     logging.info(msg='[parse dut cfg]')
     cfg_parser.clear()
-    toml_cfg = cfg_parser.check(sid)
+    toml_cfg = cfg_parser.check(repo)
     if toml_cfg[0]:
         logging.info(msg=toml_cfg[1])
     else:

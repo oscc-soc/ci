@@ -31,28 +31,23 @@ class CoreQueue(object):
             ret = config.exec_cmd(f'git checkout {bran_name}')
             logging.info(msg=ret)
 
-    # return: (state: bool, std_date: str)
+    # return: (upd_state: bool, upd_date: str)
     # state: if submod repo has new commit
     def check_remote_update(self, submod_name: str) -> (Tuple[bool, str]):
-        os.chdir(config.SUB_DIR + '/' + submod_name)
-        cmd = 'git rev-parse HEAD'
-        local_rev = config.exec_cmd(cmd)
+        os.chdir(f'{config.SUB_DIR}/{submod_name}')
+        local_rev = config.exec_cmd('git rev-parse HEAD')
 
         self.sw_branch(config.BRANCH_NAME_DEV)
-        cmd = 'git remote -v update'
-        config.exec_cmd(cmd)
+        config.exec_cmd('git remote -v update')
 
-        cmd = 'git rev-parse origin/HEAD'
-        remote_rev = config.exec_cmd(cmd)
+        remote_rev = config.exec_cmd('git rev-parse origin/HEAD')
 
         cmd = f'git log origin/{config.BRANCH_NAME_DEV}'
         cmd += ' --pretty=format:"%s" -1'
-        # print(cmd)
         title_rev = config.exec_cmd(cmd)
 
         cmd = f'git log origin/{config.BRANCH_NAME_DEV}'
         cmd += ' --pretty=format:"%ad" -1'
-        # print(date_rev)
         date_rev = config.exec_cmd(cmd)
 
         std_date = datetime.strptime(date_rev, config.GMT_FORMAT).strftime(
@@ -82,45 +77,36 @@ class CoreQueue(object):
 
     # check if remote repo has been updated
     def check_repo(self, dut_info: DUTInfo):
-        ret = self.check_remote_update(dut_info.repo)
+        (upd_state, upd_date) = self.check_remote_update(dut_info.repo)
         # restart is also right
-        if dut_info.flag == 'F':
-            logging.info(msg=f'[{dut_info.repo}] first! start pull...')
-            self.pull_repo(dut_info.repo)
-            report.create_dir(dut_info.repo)
-            parse_res = config_parser.main(dut_info.repo)
-            if parse_res[0] is True:
-                self.sub_list.append(
-                    QueueInfo(dut_info.repo, ret[1],
-                              config_parser.submit_config()))
+        if dut_info.flag == 'F' or upd_state:
+            if dut_info.flag == 'F':
+                logging.info(msg=f'[{dut_info.repo}] first! start pull...')
             else:
-                report.gen_state(parse_res[1])
-                config.git_commit(config.RPT_DIR, '[bot] update state file',
-                                  True)
+                logging.info(msg=f'[{dut_info.repo}] changed!! start pull...')
 
-        elif ret[0] is True:
-            logging.info(msg=f'[{dut_info.repo}] changed!! start pull...')
             self.pull_repo(dut_info.repo)
             report.create_dir(dut_info.repo)
-            parse_res = config_parser.main(dut_info.repo)
-            if parse_res[0] is True:
+            (parse_state, parse_info) = config_parser.main(dut_info.repo)
+            if parse_state:
                 self.sub_list.append(
-                    QueueInfo(dut_info.repo, ret[1],
+                    QueueInfo(dut_info.repo, upd_date,
                               config_parser.submit_config()))
-            else:
-                report.gen_state(parse_res[1])
-                config.git_commit(config.RPT_DIR, '[bot] update state file',
-                                  True)
+
+            # update state file
+            report.gen_state(parse_info)
+            config.git_commit(config.RPT_DIR, '[bot] update state file', False)
         else:
             logging.info(msg=f'[{dut_info.repo}] not changed')
 
-    # check if cores have been added to the cicd database
-    def check_id(self):
-        logging.info('[check id]')
-        with open(config.DUT_LIST_PATH, 'r', encoding='utf-8') as fp:
-            for v in fp:
-                dut_info = v.split()
-                self.check_repo(DUTInfo('', dut_info[0], dut_info[1]))
+    # check if duts have been added to the cicd database
+    def check_dut(self):
+        logging.info('[check dut]')
+        with open(config.DUT_LIST_PATH, 'rb') as fp:
+            dut_list = pickle.load(fp)
+            for v in dut_list:
+                logging.info(msg=f'[check dut]: {v}')
+                self.check_repo(v)
 
     def update_queue(self):
         logging.info('[update queue]')
@@ -134,7 +120,7 @@ class CoreQueue(object):
         with open(config.QUEUE_LIST_PATH, 'rb') as fp:
             self.old_sub_list = pickle.load(fp)
             logging.info(msg=self.old_sub_list)
-            # check if new-submit cores are in self.sub_list
+            # check if new-submit duts are in self.sub_list
             for i, va in enumerate(self.old_sub_list):
                 for j, vb in enumerate(self.sub_list):
                     if va.repo == vb.repo:
@@ -156,8 +142,8 @@ def main():
     logging.info('[repo update]')
     os.system(f'mkdir -p {config.DATA_DIR}')
     core_queue.clear()
-    core_queue.check_id()
-    core_queue.update_queue()
+    core_queue.check_dut()
+    # core_queue.update_queue()
 
 
 if __name__ == '__main__':
