@@ -46,7 +46,7 @@ class VCSTest(object):
 
     def intg_soc(self):
         os.chdir(config.VCS_CPU_DIR)
-        dut_path = config.SUB_DIR + '/' + self.dut_cfg.file
+        dut_path = f'{config.SUB_DIR}/{self.dut_cfg.file}'
         os.system(f'cp -rf {dut_path} .')
 
         os.chdir(config.VCS_SCRIPT_DIR)
@@ -105,7 +105,7 @@ class VCSTest(object):
         wave_path = self.gen_wave_dir()
         os.system(f'cp -rf {wave_name}.fst {wave_path}')
         os.chdir(wave_path)
-        
+
         os.chdir(config.HOME_DIR)
 
     def clear_wave_rpt(self):
@@ -203,7 +203,6 @@ vcstest = VCSTest()
 def main(sub_date: str, sub_time: str, dut_cfg: DUTConfig,
          vcs_cfg: VCSConfig) -> bool:
     logging.info(msg='[vcs test]')
-    return True
     vcstest.clear()
     vcstest.date = sub_date
     vcstest.time = sub_time
