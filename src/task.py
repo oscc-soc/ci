@@ -1,5 +1,6 @@
 #!/bin/python
 
+import os
 import time
 import logging
 import schedule
@@ -22,13 +23,19 @@ def main_task():
     dispatch.main()
 
 
+# backup previous version run log
+if os.path.isfile(config.RUN_LOG_PATH):
+    os.system(f'cp -rf {config.RUN_LOG_PATH} {config.RUN_LOG_PATH}_bp')
+
 # prio level: DEBUG < INFO < WARNING < ERROR < CRITICAL
 # logging print message which greater than prio level
-logging.basicConfig(filename=config.RUN_LOG_PATH, filemode='a',
+logging.basicConfig(filename=config.RUN_LOG_PATH,
+                    filemode='a',
                     format='%(asctime)s %(name)s:%(levelname)s:%(message)s',
-                    datefmt='%Y-%M-%d %H:%M:%S', level=logging.DEBUG)
+                    datefmt='%Y-%M-%d %H:%M:%S',
+                    level=logging.DEBUG)
 
-logging.info('\n=====NEW LOG======\n') #TODO: add start screen
+logging.info('\n=====NEW LOG======\n')  #TODO: add start screen
 schedule.every(1).seconds.do(main_task)
 
 while True:

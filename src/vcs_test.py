@@ -4,7 +4,7 @@ from enum import Enum
 import os
 import logging
 import config
-from data_type import DUTConfig, VCSConfig
+from data_type import CommitConfig, DUTConfig, VCSConfig
 
 
 class LogState(Enum):
@@ -14,22 +14,20 @@ class LogState(Enum):
 
 class VCSTest(object):
     def __init__(self):
-        self.date = ''
-        self.time = ''
         self.lint = []
         self.warn = []
         self.err = []
         self.run_res = {}
+        self.cmt_cfg = CommitConfig('', '', '')
         self.dut_cfg = DUTConfig('', '', '', '')
         self.vcs_cfg = VCSConfig(25, ('', ''), False)
 
     def clear(self):
-        self.date = ''
-        self.time = ''
         self.lint = []
         self.warn = []
         self.err = []
         self.run_res = {}
+        self.cmt_cfg = CommitConfig('', '', '')
         self.dut_cfg = DUTConfig('', '', '', '')
         self.vcs_cfg = VCSConfig(25, ('', ''), False)
         self.clear_env()
@@ -46,7 +44,7 @@ class VCSTest(object):
 
     def intg_soc(self):
         os.chdir(config.VCS_CPU_DIR)
-        dut_path = f'{config.SUB_DIR}/{self.dut_cfg.file}'
+        dut_path = f'{config.SUB_DIR}/{self.cmt_cfg.repo}/{self.dut_cfg.file}'
         os.system(f'cp -rf {dut_path} .')
 
         os.chdir(config.VCS_SCRIPT_DIR)
@@ -140,14 +138,14 @@ class VCSTest(object):
             self.collect_run_log(self.vcs_cfg.prog[0], self.vcs_cfg.prog[1])
 
     def gen_rpt_dir(self) -> str:
-        rpt_path = f'{config.RPT_DIR}/{self.dut_cfg.top}'
-        rpt_path += f'/{self.date}-{self.time}'
+        rpt_path = f'{config.RPT_DIR}/{self.cmt_cfg.repo}'
+        rpt_path += f'/{self.cmt_cfg.date}-{self.cmt_cfg.time}'
         os.system(f'mkdir -p {rpt_path}')
         return rpt_path
 
     def gen_wave_dir(self) -> str:
-        wave_path = f'{config.WAVE_DIR}/{self.dut_cfg.top}'
-        wave_path += f'/{self.date}-{self.time}'
+        wave_path = f'{config.WAVE_DIR}/{self.cmt_cfg.repo}'
+        wave_path += f'/{self.cmt_cfg.date}-{self.cmt_cfg.time}'
         os.system(f'mkdir -p {wave_path}')
         return wave_path
 
@@ -200,18 +198,18 @@ class VCSTest(object):
 vcstest = VCSTest()
 
 
-def main(sub_date: str, sub_time: str, dut_cfg: DUTConfig,
+def main(cmt_cfg: CommitConfig, dut_cfg: DUTConfig,
          vcs_cfg: VCSConfig) -> bool:
     logging.info(msg='[vcs test]')
     vcstest.clear()
-    vcstest.date = sub_date
-    vcstest.time = sub_time
+    vcstest.cmt_cfg = cmt_cfg
     vcstest.dut_cfg = dut_cfg
     vcstest.vcs_cfg = vcs_cfg
     vcstest.intg_soc()
     comp_res = True
     vcstest.comp()
     comp_res = vcstest.gen_comp_rpt()
+    return comp_res
 
     if comp_res is True:
         vcstest.run()
@@ -220,4 +218,5 @@ def main(sub_date: str, sub_time: str, dut_cfg: DUTConfig,
 
 
 if __name__ == '__main__':
-    main('', '', DUTConfig('', '', '', ''), VCSConfig(25, ('', ''), False))
+    main(CommitConfig('', '', ''), DUTConfig('', '', '', ''),
+         VCSConfig(25, ('', ''), False))

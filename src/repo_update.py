@@ -7,10 +7,10 @@ from typing import Tuple
 import config
 import config_parser
 import report
-from data_type import DUTInfo, QueueInfo
+from data_type import DUTInfo, QueueInfo, CommitConfig
 
 
-class CoreQueue(object):
+class DUTQueue(object):
     def __init__(self):
         self.sub_list = []
         self.old_sub_list = []
@@ -71,10 +71,6 @@ class CoreQueue(object):
         print(ret)
         os.chdir(config.HOME_DIR)
 
-    # check if config is valid and parse the config
-    def parse_cfg(self):
-        pass
-
     # check if remote repo has been updated
     def check_repo(self, dut_info: DUTInfo):
         (upd_state, upd_date) = self.check_remote_update(dut_info.repo)
@@ -90,13 +86,17 @@ class CoreQueue(object):
             (parse_state, parse_info) = config_parser.main(dut_info.repo)
             if parse_state:
                 self.sub_list.append(
-                    QueueInfo(dut_info.repo, upd_date,
-                              config_parser.submit_config()))
+                    QueueInfo(
+                        CommitConfig(dut_info.repo,
+                                     upd_date.split()[0],
+                                     upd_date.split()[1]),
+                        config_parser.submit_config()))
 
             # update state file
             report.gen_state(parse_info)
-            config.git_commit(config.RPT_DIR, '[bot] update state file',
-                              False)  # NOTE: need to set 'True' when in product env
+            config.git_commit(
+                config.RPT_DIR, '[bot] update state file',
+                False)  # NOTE: need to set 'True' when in product env
         else:
             logging.info(msg=f'[{dut_info.repo}] not changed')
 
@@ -111,7 +111,9 @@ class CoreQueue(object):
 
     def update_queue(self):
         logging.info('[update queue]')
-        self.sub_list.sort(key=lambda v: v.date)
+        self.sub_list.sort(key=lambda v: f'{v.cmt_cfg.date} {v.cmt_cfg.time}')
+        for v in self.sub_list:
+            logging.info(msg=f'sub_list: {v}')
         # check if queue list file exist
         if os.path.isfile(config.QUEUE_LIST_PATH) is False:
             with open(config.QUEUE_LIST_PATH, 'wb') as fp:
@@ -120,31 +122,35 @@ class CoreQueue(object):
 
         with open(config.QUEUE_LIST_PATH, 'rb') as fp:
             self.old_sub_list = pickle.load(fp)
-            logging.info(msg=self.old_sub_list)
+            for v in self.old_sub_list:
+                logging.info(msg=v)
             # check if new-submit duts are in self.sub_list
             for i, va in enumerate(self.old_sub_list):
                 for j, vb in enumerate(self.sub_list):
-                    if va.repo == vb.repo:
+                    if va.cmt_cfg.repo == vb.cmt_cfg.repo:
                         self.old_sub_list[i] = self.sub_list[j]
-                        self.sub_list[j].repo = '@'
+                        self.sub_list[j].cmt_cfg.repo = '@'
 
             for v in self.sub_list:
-                if v.repo != '@':
+                if v.cmt_cfg.repo != '@':
                     self.old_sub_list.append(v)
+
+        for v in self.old_sub_list:
+            logging.info(msg=f'[after]{v}')
 
         with open(config.QUEUE_LIST_PATH, 'wb') as fp:
             pickle.dump(self.old_sub_list, fp)
 
 
-core_queue = CoreQueue()
+dut_queue = DUTQueue()
 
 
 def main():
     logging.info('[repo update]')
     os.system(f'mkdir -p {config.DATA_DIR}')
-    core_queue.clear()
-    core_queue.check_dut()
-    core_queue.update_queue()
+    dut_queue.clear()
+    dut_queue.check_dut()
+    dut_queue.update_queue()
 
 
 if __name__ == '__main__':

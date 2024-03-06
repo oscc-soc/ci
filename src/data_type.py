@@ -60,6 +60,16 @@ class DCConfig(object):
         return f'freq: {self.freq} corner: {self.corner} retime: {self.retime}'
 
 
+class CommitConfig(object):
+    def __init__(self, repo: str, date: str, time: str):
+        self.repo = repo
+        self.date = date
+        self.time = time
+
+    def __str__(self) -> str:
+        return f'repo: {self.repo} date: {self.date} time: {self.time}'
+
+
 class SubmitConfig(object):
     def __init__(self, dut_cfg: DUTConfig, iv_cfg: IverilogConfig,
                  ver_cfg: VerilatorConfig, vcs_cfg: VCSConfig,
@@ -71,15 +81,15 @@ class SubmitConfig(object):
         self.dc_cfg = dc_cfg
 
     def __str__(self) -> str:
-        return f'''iv_cfg: {self.iv_cfg} ver_cfg: {self.ver_cfg}
-                   vcs_cfg: {self.vcs_cfg} dc_cfg: {self.dc_cfg}'''
+        return f'''dut_cfg: {self.dut_cfg} iv_cfg: {self.iv_cfg}
+                   ver_cfg: {self.ver_cfg} vcs_cfg: {self.vcs_cfg} 
+                   dc_cfg: {self.dc_cfg}'''
 
 
 class QueueInfo(object):
-    def __init__(self, repo: str, date: str, sub_cfg: SubmitConfig):
-        self.repo = repo
-        self.date = date
+    def __init__(self, cmt_cfg: CommitConfig, sub_cfg: SubmitConfig):
+        self.cmt_cfg = cmt_cfg
         self.sub_cfg = sub_cfg
 
     def __str__(self) -> str:
-        return f'repo: {self.repo} date: {self.date} sub_cfg: {self.sub_cfg}'
+        return f'cmt_cfg: {self.cmt_cfg} sub_cfg: {self.sub_cfg}'

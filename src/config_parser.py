@@ -1,4 +1,5 @@
 import os
+import copy
 import logging
 from typing import Any, Dict, Tuple
 import tomli
@@ -200,8 +201,8 @@ class ConfigParser(object):
         return (True, 'check dc cfg table done with no error')
 
     def check(self, repo) -> Tuple[bool, str]:
-        core_dir = config.SUB_DIR + '/' + repo
-        core_cfg_file = core_dir + '/config.toml'
+        core_dir = f'{config.SUB_DIR}/{repo}'
+        core_cfg_file = f'{core_dir}/config.toml'
         logging.info(msg=core_cfg_file)
         # check if config toml exists
         if os.path.isfile(core_cfg_file):
@@ -243,7 +244,8 @@ def main(repo: str) -> Tuple[bool, str]:
 
 
 def submit_config() -> SubmitConfig:
-    return cfg_parser.sub_cfg
+    logging.info(msg=f'{cfg_parser.sub_cfg}')
+    return copy.deepcopy(cfg_parser.sub_cfg)  # NOTE: copy class instance
 
 
 if __name__ == '__main__':
