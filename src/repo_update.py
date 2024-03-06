@@ -95,7 +95,8 @@ class CoreQueue(object):
 
             # update state file
             report.gen_state(parse_info)
-            config.git_commit(config.RPT_DIR, '[bot] update state file', False)
+            config.git_commit(config.RPT_DIR, '[bot] update state file',
+                              False)  # NOTE: need to set 'True' when in product env
         else:
             logging.info(msg=f'[{dut_info.repo}] not changed')
 
@@ -143,7 +144,7 @@ def main():
     os.system(f'mkdir -p {config.DATA_DIR}')
     core_queue.clear()
     core_queue.check_dut()
-    # core_queue.update_queue()
+    core_queue.update_queue()
 
 
 if __name__ == '__main__':

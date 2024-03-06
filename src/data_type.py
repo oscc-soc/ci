@@ -76,10 +76,10 @@ class SubmitConfig(object):
 
 
 class QueueInfo(object):
-    def __init__(self, sid: str, date: str, sub_cfg: SubmitConfig):
-        self.sid = sid
+    def __init__(self, repo: str, date: str, sub_cfg: SubmitConfig):
+        self.repo = repo
         self.date = date
         self.sub_cfg = sub_cfg
 
     def __str__(self) -> str:
-        return f'sid: {self.sid} date: {self.date} sub_cfg: {self.sub_cfg}'
+        return f'repo: {self.repo} date: {self.date} sub_cfg: {self.sub_cfg}'

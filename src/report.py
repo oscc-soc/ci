@@ -13,7 +13,7 @@ report = Report()
 
 
 def create_dir(repo: str):
-    report.dut_rpt_dir = config.RPT_DIR + '/' + repo
+    report.dut_rpt_dir = f'{config.RPT_DIR}/{repo}'
     os.system(f'mkdir -p {report.dut_rpt_dir}')
 
 

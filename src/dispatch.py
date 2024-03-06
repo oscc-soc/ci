@@ -25,16 +25,20 @@ class Dispatch(object):
                 return False
 
         # pop first queue info and dispatch tasks
+        logging.info(msg=f'task queue num: {len(self.sub_list)}')
         sub_cfg = self.sub_list[0].sub_cfg
-        sub_date = self.sub_list[0].sub_date.split(' ')[0]
-        sub_time = self.sub_list[0].sub_date.split(' ')[1]
+        sub_date = self.sub_list[0].date.split()[0]
+        sub_time = self.sub_list[0].date.split()[1]
+        logging.info(msg=f'sub_cfg: {sub_cfg}')
+        logging.info(msg=f'sub_date: {sub_date}')
+        logging.info(msg=f'sub_time: {sub_time}')
         # update queue state info of other dut
-        for i, v in enumerate(self.sub_list):
-            report.create_dir(v.sub_cfg['dut']['top'])
+        for i, _v in enumerate(self.sub_list):
             if i == 0:
                 report.gen_state('under test')
             else:
                 report.gen_state(f'wait {i} duts')
+
 
         # only dut pass vcs test, then it can be test by dc flow
         if sub_cfg.dut_cfg.commit == '':
@@ -59,7 +63,7 @@ def main():
 
     dispatch.clear()
     if dispatch.parse() is False:
-        logging.info(msg='this is not core in queue')
+        logging.info(msg='this is not dut in queue')
 
 
 if __name__ == '__main__':
