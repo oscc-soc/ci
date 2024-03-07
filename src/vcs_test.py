@@ -63,7 +63,7 @@ class VCSTest(object):
 
     def collect_comp_log(self):
         log_state = [LogState.end, LogState.end, LogState.end]
-        with open(config.VCS_RUN_DIR + '/compile.log', 'r',
+        with open(f'{config.VCS_RUN_DIR}/compile.log', 'r',
                   encoding='utf-8') as fp:
             for line in fp:
                 if line[0:4] == 'Lint':
@@ -83,7 +83,7 @@ class VCSTest(object):
                     self.err.append(line)
 
     def collect_run_log(self, prog_name: str, prog_type: str):
-        with open(config.VCS_RUN_DIR + '/run.log', 'r',
+        with open(f'{config.VCS_RUN_DIR}/run.log', 'r',
                   encoding='utf-8') as fp:
             tmp_res = ''
             for line in fp:
@@ -96,8 +96,9 @@ class VCSTest(object):
             self.run_res[f'{prog_name}-{prog_type}'] = tmp_res
 
     def gen_wave_rpt(self):
+        (prog_name, prog_type) = self.vcs_cfg.prog
         os.chdir(config.VCS_RUN_DIR)
-        wave_name = f'{self.dut_cfg.top}_{self.vcs_cfg.prog[0]}_{self.vcs_cfg.prog[1]}'
+        wave_name = f'{self.dut_cfg.top}_{prog_name}_{prog_type}'
         os.system(f'fsdb2vcd asic_top.fsdb -o {wave_name}.vcd')
         os.system(f'vcd2fst -v {wave_name}.vcd -f {wave_name}.fst')
         wave_path = self.gen_wave_dir()
@@ -116,7 +117,8 @@ class VCSTest(object):
 
     def run(self):
         os.chdir(config.VCS_RUN_DIR)
-        if self.vcs_cfg.prog[0] == '':
+        (prog_name, prog_type) = self.vcs_cfg.prog
+        if prog_name == 'all':
             for pl in config.TESTCASE_NAME_LIST:
                 for mt in config.TESTCASE_TYPE_LIST:
                     self.program(pl, mt)
@@ -124,18 +126,14 @@ class VCSTest(object):
                     self.collect_run_log(pl, mt)
 
         else:
-            self.program(self.vcs_cfg.prog[0], self.vcs_cfg.prog[1])
+            self.program(prog_name, prog_type)
             if self.vcs_cfg.wave == 'off':
-                os.system(
-                    f'make run test={self.vcs_cfg.prog[0]}-{self.vcs_cfg.prog[1]}'
-                )
+                os.system(f'make run test={prog_name}-{prog_type}')
             else:
-                os.system(
-                    f'make run test={self.vcs_cfg.prog[0]}-{self.vcs_cfg.prog[1]} wave=on'
-                )
+                os.system(f'make run test={prog_name}-{prog_type} wave=on')
                 self.gen_wave_rpt()
 
-            self.collect_run_log(self.vcs_cfg.prog[0], self.vcs_cfg.prog[1])
+            self.collect_run_log(prog_name, prog_type)
 
     def gen_rpt_dir(self) -> str:
         rpt_path = f'{config.RPT_DIR}/{self.cmt_cfg.repo}'
@@ -178,19 +176,18 @@ class VCSTest(object):
 
     def gen_run_rpt(self) -> bool:
         rpt_path = self.gen_rpt_dir()
+        (prog_name, prog_type) = self.vcs_cfg.prog
         with open(f'{rpt_path}/vcs_report', 'a+', encoding='utf-8') as fp:
             fp.writelines(
                 '\n#####################\n#vcs program test\n#####################\n'
             )
 
-            if self.vcs_cfg.prog[0] == '':
+            if prog_name == 'all':
                 for pl in config.TESTCASE_NAME_LIST:
                     for mt in config.TESTCASE_TYPE_LIST:
                         fp.writelines(self.gen_run_res(pl, mt))
             else:
-                fp.writelines(
-                    self.gen_run_res(self.vcs_cfg.prog[0],
-                                     self.vcs_cfg.prog[1]))
+                fp.writelines(self.gen_run_res(prog_name, prog_type))
 
         return True
 
@@ -209,9 +206,8 @@ def main(cmt_cfg: CommitConfig, dut_cfg: DUTConfig,
     comp_res = True
     vcstest.comp()
     comp_res = vcstest.gen_comp_rpt()
-    return comp_res
 
-    if comp_res is True:
+    if comp_res:
         vcstest.run()
         return vcstest.gen_run_rpt()
     return comp_res
