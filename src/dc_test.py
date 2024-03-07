@@ -12,16 +12,16 @@ class DCTest(object):
         self.err = []
         self.warn = []
         self.cmt_cfg = CommitConfig('', '', '')
-        self.dut_cfg = DUTConfig('', '', '', '')
-        self.dc_cfg = DCConfig(100, 'TYP', False)
+        self.dut_cfg = DUTConfig('', '', '', '', '')
+        self.dc_cfg = DCConfig('', 100, 'TYP', '', '', False, '')
         self.rpt_path = ''
 
     def clear(self):
         self.err = []
         self.warn = []
         self.cmt_cfg = CommitConfig('', '', '')
-        self.dut_cfg = DUTConfig('', '', '', '')
-        self.dc_cfg = DCConfig(100, 'TYP', False)
+        self.dut_cfg = DUTConfig('', '', '', '', '')
+        self.dc_cfg = DCConfig('', 100, 'TYP', '', '', False, '')
 
         os.chdir(config.DC_SRC_DIR)
         os.system(f'cp -rf {config.TEMPLATE_DIR}/dc_run.sh run.sh')
@@ -46,10 +46,12 @@ class DCTest(object):
         # config retime
         if self.dc_cfg.retime == 'on':
             os.system(
-                f'cp -rf {config.TEMPLATE_DIR}/dc_retime_flow.tcl flow_com/syn_common_flow.tcl')
+                f'cp -rf {config.TEMPLATE_DIR}/dc_retime_flow.tcl flow_com/syn_common_flow.tcl'
+            )
         else:
             os.system(
-                f'cp -rf {config.TEMPLATE_DIR}/dc_noretime_flow.tcl flow_com/syn_common_flow.tcl')
+                f'cp -rf {config.TEMPLATE_DIR}/dc_noretime_flow.tcl flow_com/syn_common_flow.tcl'
+            )
 
         # config hdl read path and top name
         os.chdir(config.DC_CFG_DIR)
@@ -168,5 +170,5 @@ def main(cmt_cfg: CommitConfig, dut_cfg: DUTConfig, dc_cfg: DCConfig) -> bool:
 
 
 if __name__ == '__main__':
-    main(CommitConfig('', '', ''), DUTConfig('', '', '', ''),
-         DCConfig(100, 'TYP', False))
+    main(CommitConfig('', '', ''), DUTConfig('', '', '', '', ''),
+         DCConfig('', 100, 'TYP', '', '', False, ''))

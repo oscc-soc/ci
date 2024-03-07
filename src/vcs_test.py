@@ -19,7 +19,7 @@ class VCSTest(object):
         self.err = []
         self.run_res = {}
         self.cmt_cfg = CommitConfig('', '', '')
-        self.dut_cfg = DUTConfig('', '', '', '')
+        self.dut_cfg = DUTConfig('', '', '', '', '')
         self.vcs_cfg = VCSConfig(25, ('', ''), False)
 
     def clear(self):
@@ -28,7 +28,7 @@ class VCSTest(object):
         self.err = []
         self.run_res = {}
         self.cmt_cfg = CommitConfig('', '', '')
-        self.dut_cfg = DUTConfig('', '', '', '')
+        self.dut_cfg = DUTConfig('', '', '', '', '')
         self.vcs_cfg = VCSConfig(25, ('', ''), False)
         self.clear_env()
 
@@ -51,14 +51,16 @@ class VCSTest(object):
         os.system('python autowire.py')
         os.chdir(config.HOME_DIR)
 
-    def program(self, prog_name: str, prog_type: str):
+    def program(self, arch: str, prog_name: str, prog_type: str):
         if prog_type == 'flash':
             os.system(
-                f'ln -sf program/{prog_name}.{prog_type} mem_Q128_bottom.vmf')
+                f'ln -sf program/{arch}/{prog_name}.{prog_type} mem_Q128_bottom.vmf'
+            )
         else:
-            os.system(f'ln -sf program/jump.{prog_type} mem_Q128_bottom.vmf')
             os.system(
-                f'ln -sf program/{prog_name}.{prog_type} init_{prog_type}.bin.txt'
+                f'ln -sf program/{arch}/jump.{prog_type} mem_Q128_bottom.vmf')
+            os.system(
+                f'ln -sf program/{arch}/{prog_name}.{prog_type} init_{prog_type}.bin.txt'
             )
 
     def collect_comp_log(self):
@@ -123,12 +125,12 @@ class VCSTest(object):
         if prog_name == 'all':
             for pl in config.TESTCASE_NAME_LIST:
                 for mt in config.TESTCASE_TYPE_LIST:
-                    self.program(pl, mt)
+                    self.program(self.dut_cfg.arch, pl, mt)
                     os.system(f'make run test={pl}-{mt}')
                     self.collect_run_log(pl, mt)
 
         else:
-            self.program(prog_name, prog_type)
+            self.program(self.dut_cfg.arch, prog_name, prog_type)
             if self.vcs_cfg.wave == 'off':
                 os.system(f'make run test={prog_name}-{prog_type}')
             else:
@@ -216,5 +218,5 @@ def main(cmt_cfg: CommitConfig, dut_cfg: DUTConfig,
 
 
 if __name__ == '__main__':
-    main(CommitConfig('', '', ''), DUTConfig('', '', '', ''),
+    main(CommitConfig('', '', ''), DUTConfig('', '', '', '', ''),
          VCSConfig(25, ('', ''), False))

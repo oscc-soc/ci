@@ -1,7 +1,7 @@
 import os
 import copy
 import logging
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Tuple, List
 import tomli
 import config
 from data_type import DUTConfig, IverilogConfig
@@ -15,7 +15,7 @@ class ConfigParser(object):
         self.def_iv = IverilogConfig('')
         self.def_ver = VerilatorConfig('')
         self.def_vcs = VCSConfig(25, ('', ''), False)
-        self.def_dc = DCConfig(100, 'TYP', False)
+        self.def_dc = DCConfig('', 100, 'TYP', '', '', False, '')
         self.sub_cfg = SubmitConfig(self.def_dut, self.def_iv, self.def_ver,
                                     self.def_vcs, self.def_dc)
 
@@ -23,17 +23,25 @@ class ConfigParser(object):
         self.sub_cfg = SubmitConfig(self.def_dut, self.def_iv, self.def_ver,
                                     self.def_vcs, self.def_dc)
 
+    def check_item(self, item: str, cfg_list: Dict[str, Any],
+                   option_list: List[str]) -> Tuple[bool, str, str]:
+        if cfg_list.get(item) is None:
+            return (False, f'dont have {item} cfg item', '')
+
+        item_val = cfg_list[item]
+        for v in option_list:
+            if v == item_val:
+                return (True, f'{item} check done with no error', v)
+
+        return (False, f'{item} cfg item value is wrong', '')
+
     def check_arch(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
-        if cfg_list.get('arch') is None:
-            return (False, 'dont have arch cfg item')
-
-        arch = cfg_list['arch']
-        test_list = ['rv32e', 'rv32i', 'rv32im', 'rv64i', 'rv64im']
-        for v in test_list:
-            if arch == v:
-                return (True, 'arch check done with no error')
-
-        return (False, 'arch cfg item value is wrong')
+        option_list = ['rv32e', 'rv32i', 'rv32im', 'rv64i', 'rv64im']
+        (ck_state, ck_info, ck_val) = self.check_item('arch', cfg_list,
+                                                      option_list)
+        if ck_state:
+            self.sub_cfg.dut_cfg.arch = ck_val
+        return (ck_state, ck_info)
 
     def check_file_top_clk(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
         if cfg_list.get('file') is None:
@@ -108,60 +116,61 @@ class ConfigParser(object):
         return (False, 'prog cfg item value is wrong')
 
     def check_wave(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
-        if cfg_list.get('wave') is None:
-            return (False, 'dont have wave cfg item')
+        option_list = ['off', 'on']
+        (ck_state, ck_info, ck_val) = self.check_item('wave', cfg_list,
+                                                      option_list)
+        if ck_state:
+            self.sub_cfg.vcs_cfg.wave = ck_val
+        return (ck_state, ck_info)
 
-        switch_list = ['off', 'on']
-        for v in switch_list:
-            if v == cfg_list['wave']:
-                self.sub_cfg.vcs_cfg.wave = cfg_list['wave']
-                return (True, 'wave check done with no error')
-
-        return (False, 'wave item value is wrong')
+    def check_process(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        option_list = ['28', '40', '110', '130']
+        (ck_state, ck_info, ck_val) = self.check_item('process', cfg_list,
+                                                      option_list)
+        if ck_state:
+            self.sub_cfg.dc_cfg.process = ck_val
+        return (ck_state, ck_info)
 
     def check_corner(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
-        if cfg_list.get('corner') is None:
-            return (False, 'dont have corner cfg item')
+        option_list = ['WCZ', 'MAX', 'WCL', 'TYP', 'MIN', 'ML', 'MZ']
+        (ck_state, ck_info, ck_val) = self.check_item('corner', cfg_list,
+                                                      option_list)
+        if ck_state:
+            self.sub_cfg.dc_cfg.corner = ck_val
+        return (ck_state, ck_info)
 
-        corner_list = ['WCZ', 'MAX', 'WCL', 'TYP', 'MIN', 'ML', 'MZ']
-        for v in corner_list:
-            if v == cfg_list['corner']:
-                self.sub_cfg.dc_cfg.corner = cfg_list['corner']
-                return (True, 'corner check done with no error')
+    def check_track(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        option_list = ['8T', '9T', '10T', '11T', '12T']
+        (ck_state, ck_info, ck_val) = self.check_item('track', cfg_list,
+                                                      option_list)
+        if ck_state:
+            self.sub_cfg.dc_cfg.track = ck_val
+        return (ck_state, ck_info)
 
-        return (False, 'corner item value is wrong')
+    # dont use
+    def check_volt_chnl(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        option_list = ['SVT40', 'LVT40']
+        (ck_state, ck_info, ck_val) = self.check_item('volt_chnl', cfg_list,
+                                                      option_list)
+        if ck_state:
+            self.sub_cfg.dc_cfg.volt_chnl = ck_val
+        return (ck_state, ck_info)
 
     def check_retime(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
-        if cfg_list.get('retime') is None:
-            return (False, 'dont have retime cfg item')
-
-        switch_list = ['off', 'on']
-        for v in switch_list:
-            if v == cfg_list['retime']:
-                self.sub_cfg.dc_cfg.retime = cfg_list['retime']
-                return (True, 'retime check done with no error')
-
-        return (False, 'retime item value is wrong')
+        option_list = ['off', 'on']
+        (ck_state, ck_info, ck_val) = self.check_item('retime', cfg_list,
+                                                      option_list)
+        if ck_state:
+            self.sub_cfg.dc_cfg.retime = ck_val
+        return (ck_state, ck_info)
 
     def check_commit(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
-        if cfg_list.get('commit') is None:
-            return (False, 'dont have commit cfg item')
-
-        # exec git cmd to get commit info
-        # cmd = f'git log origin/{config.BRANCH_NAME_DEV}'
-        # cmd += ' --pretty=format:"%s" -1'
-        # logging.info(msg=cmd)
-        # self.sub_cfg.dut_cfg.commit = config.exec_cmd(cmd)
-        self.sub_cfg.dut_cfg.commit = cfg_list['commit']
-        logging.info(msg=self.sub_cfg.dut_cfg.commit)
-        # print(self.sub_cfg.dut_cfg.commit)
-
-        # check if git cmd is valid and equal to config toml value
-        test_list = ['', 'vcs', 'dc']
-        for v in test_list:
-            if self.sub_cfg.dut_cfg.commit == v:
-                return (True, 'commit check done with no error')
-        return (False, 'commit cfg item value is wrong')
+        option_list = ['', 'vcs', 'dc']
+        (ck_state, ck_info, ck_val) = self.check_item('commit', cfg_list,
+                                                      option_list)
+        if ck_state:
+            self.sub_cfg.dut_cfg.commit = ck_val
+        return (ck_state, ck_info)
 
     def check_dut(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
         if cfg_list.get('dut') is None:
@@ -203,11 +212,19 @@ class ConfigParser(object):
         if cfg_list.get('dc') is None:
             return (False, 'dont have dc cfg table')
 
+        check_res = self.check_process(cfg_list['dc'])
+        if check_res[0] is False:
+            return check_res
+
         check_res = self.check_freq(cfg_list['dc'], 'dc')
         if check_res[0] is False:
             return check_res
 
         check_res = self.check_corner(cfg_list['dc'])
+        if check_res[0] is False:
+            return check_res
+
+        check_res = self.check_track(cfg_list['dc'])
         if check_res[0] is False:
             return check_res
 

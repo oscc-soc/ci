@@ -52,13 +52,21 @@ class VCSConfig(object):
 
 
 class DCConfig(object):
-    def __init__(self, freq: int, corner: str, retime: bool):
+    def __init__(self, process: str, freq: int, corner: str, track: str,
+                 volt_chnl: str, retime: bool, user: str):
+        self.process = process
         self.freq = freq
         self.corner = corner
+        self.track = track
+        self.volt_chnl = volt_chnl
         self.retime = retime
+        self.user = user
 
     def __str__(self) -> str:
-        return f'freq: {self.freq} corner: {self.corner} retime: {self.retime}'
+        return f'''process: {self.process} freq: {str(self.freq)}
+                   corner: {self.corner} track: {self.track}
+                   volt_chnl: {self.volt_chnl} retime: {self.retime}
+                   user: {self.user}'''
 
 
 class CommitConfig(object):
