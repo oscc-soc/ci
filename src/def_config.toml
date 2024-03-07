@@ -3,9 +3,9 @@
 # this config only supports string in bracket, other words dont support
 
 [meta]
-project = "demo"
-author  = "Ben"
-version = "1.0"
+project = "demo"                     # [dont use]
+author  = "Ben"                      # [dont use]
+version = "1.0"                      # [dont use]
 
 [dut]
 arch        = "rv64im"               # [rv32e rv32i rv32im rv64i rv64im]
@@ -19,36 +19,36 @@ commit      = ""                     # support ["", "vcs", "dc"] leave a blank m
                                      # example: commit == "dc" mean only run dc test
 
 [iverilog]
-flag = "iv"                          # commit flag[dont use]
+flag = "iv"                          # commit flag [dont use]
 
 [verilator]
-flag = "ver"                         # commit flag[dont use]
+flag = "ver"                         # commit flag [dont use]
 
 [yosys]
-flag        = "yosys"                # commit flag[dont use]
-freq        = 25
+flag        = "yosys"                # commit flag [dont use]
+freq        = 25                     # [dont use]
 
 [vcs]
-flag        = "vcs"                  # commit flag[dont use]
-freq        = 25
+flag        = "vcs"                  # commit flag [dont use]
+freq        = 25                     # [dont use]
 prog        = {name = "", type = ""} # format: [name]-[type] name: [hello, memtest, rtthread] type: [flash, mem, sdram]
                                      # leave name item a blank mean test all programs
 wave        = "off"                  # [off on] note: wave option only valid when prog.name is not a blank and wave is "on"
 
 [dc]
-flag        = "dc"                   # commit flag[dont use]
+flag        = "dc"                   # commit flag [dont use]
 process     = "28"                   # [110, 40, 28] [fixed value]
 freq        = 100                    # [100, 800, step: 50]
 corner      = "TYP"                  # [WCZ MAX WCL TYP MIN ML MZ]
-track       = "8T"                   # [8T ...] [dont use]
+track       = "9T"                   # [8T 9T 10T 11T 12T] [fixed value]
 volt_chnl   = "SVT40"                # voltage threshold and channel length secletion such as "SVT40+SVT35"
-                                     # or "SVT40+LVT35:0.3" to limit ration of LVT35
+                                     # or "SVT40+LVT35:0.3" to limit ration of LVT35 [fixed value]
 retime      = "off"                  # [off on]
-user        = ""                     # [dont use]
+user        = ""                     # user report suffix [fixed value]
 
 [ieda]
-flag        = "ieda"                 # commit flag[dont use]
+flag        = "ieda"                 # commit flag [dont use]
 
 [fpga]
-flag        = "fpga"                 # commit flag[dont use]
+flag        = "fpga"                 # commit flag [dont use]
 freq        = 25
