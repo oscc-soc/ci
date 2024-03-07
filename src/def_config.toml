@@ -8,6 +8,7 @@ author  = "Ben"
 version = "1.0"
 
 [dut]
+arch        = "rv64im"               # [rv32e rv32i rv32im rv64i rv64im]
 file        = "ysyx_xxxxxxxx.v"      # dut file name TODO: support filelist
 top         = "ysyx_xxxxxxxx"        # top module name
 clk         = "clk"                  # top clock signal name
@@ -40,3 +41,7 @@ volt_chnl   = "SVT40"                # voltage threshold and channel length secl
                                      # or "SVT40+LVT35:0.3" to limit ration of LVT35
 retime      = "off"                  # [off on]
 user        = ""                     # [dont use]
+
+[fpga]
+flag        = "fpga"                 # commit flag[dont use]
+freq        = 25
