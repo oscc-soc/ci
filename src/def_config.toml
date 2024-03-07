@@ -24,6 +24,10 @@ flag = "iv"                          # commit flag[dont use]
 [verilator]
 flag = "ver"                         # commit flag[dont use]
 
+[yosys]
+flag        = "yosys"                # commit flag[dont use]
+freq        = 25
+
 [vcs]
 flag        = "vcs"                  # commit flag[dont use]
 freq        = 25
@@ -32,7 +36,7 @@ prog        = {name = "", type = ""} # format: [name]-[type] name: [hello, memte
 wave        = "off"                  # [off on] note: wave option only valid when prog.name is not a blank and wave is "on"
 
 [dc]
-flag        = "dc"                   # flag[dont use]
+flag        = "dc"                   # commit flag[dont use]
 process     = "28"                   # [110, 40, 28] [fixed value]
 freq        = 100                    # [100, 800, step: 50]
 corner      = "TYP"                  # [WCZ MAX WCL TYP MIN ML MZ]
@@ -41,6 +45,9 @@ volt_chnl   = "SVT40"                # voltage threshold and channel length secl
                                      # or "SVT40+LVT35:0.3" to limit ration of LVT35
 retime      = "off"                  # [off on]
 user        = ""                     # [dont use]
+
+[ieda]
+flag        = "ieda"                 # commit flag[dont use]
 
 [fpga]
 flag        = "fpga"                 # commit flag[dont use]

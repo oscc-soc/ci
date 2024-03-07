@@ -5,12 +5,13 @@ from typing import Any, Dict, Tuple
 import tomli
 import config
 from data_type import DUTConfig, IverilogConfig
-from data_type import VerilatorConfig, VCSConfig, DCConfig, SubmitConfig
+from data_type import VerilatorConfig, VCSConfig
+from data_type import DCConfig, SubmitConfig
 
 
 class ConfigParser(object):
     def __init__(self):
-        self.def_dut = DUTConfig('', '', '', '')
+        self.def_dut = DUTConfig('', '', '', '', '')
         self.def_iv = IverilogConfig('')
         self.def_ver = VerilatorConfig('')
         self.def_vcs = VCSConfig(25, ('', ''), False)
@@ -21,6 +22,18 @@ class ConfigParser(object):
     def clear(self):
         self.sub_cfg = SubmitConfig(self.def_dut, self.def_iv, self.def_ver,
                                     self.def_vcs, self.def_dc)
+
+    def check_arch(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        if cfg_list.get('arch') is None:
+            return (False, 'dont have arch cfg item')
+
+        arch = cfg_list['arch']
+        test_list = ['rv32e', 'rv32i', 'rv32im', 'rv64i', 'rv64im']
+        for v in test_list:
+            if arch == v:
+                return (True, 'arch check done with no error')
+
+        return (False, 'arch cfg item value is wrong')
 
     def check_file_top_clk(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
         if cfg_list.get('file') is None:
@@ -153,6 +166,10 @@ class ConfigParser(object):
     def check_dut(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
         if cfg_list.get('dut') is None:
             return (False, 'dont have dut cfg table')
+
+        check_res = self.check_arch(cfg_list['dut'])
+        if check_res[0] is False:
+            return check_res
 
         check_res = self.check_file_top_clk(cfg_list['dut'])
         if check_res[0] is False:

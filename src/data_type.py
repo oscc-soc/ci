@@ -14,14 +14,15 @@ class DUTInfo(object):
 
 
 class DUTConfig(object):
-    def __init__(self, file: str, top: str, clk: str, commit: str):
+    def __init__(self, arch: str, file: str, top: str, clk: str, commit: str):
+        self.arch = arch
         self.file = file
         self.top = top
         self.clk = clk
         self.commit = commit
 
     def __str__(self) -> str:
-        return f'file: {self.file} clk: {self.clk} top: {self.top}'
+        return f'arch: {self.arch} file: {self.file} clk: {self.clk} top: {self.top}'
 
 
 class IverilogConfig(object):

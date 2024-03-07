@@ -92,7 +92,7 @@ class DCTest(object):
                     self.warn.append(line)
                     res += line
             res += f'****** Message Summary:{len(self.err)} Errors(s) '
-            res += f'{len(self.warn)} Warning(s) ******'
+            res += f'{len(self.warn)} Warning(s) ******\n'
         return res
 
     def collect_stat_rpt(self) -> str:
