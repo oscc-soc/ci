@@ -42,15 +42,13 @@ class Dispatch(object):
 
         # only dut pass vcs test, then it can be test by dc flow
         if sub_cfg.dut_cfg.commit == '':
-            if vcs_test.main(cmt_cfg, sub_cfg.dut_cfg,
-                             sub_cfg.vcs_cfg):
-                pass
-                # dc_test.main(cmt_cfg, sub_cfg.dut_cfg, sub_cfg['dc'])
+            if vcs_test.main(cmt_cfg, sub_cfg.dut_cfg, sub_cfg.vcs_cfg):
+                dc_test.main(cmt_cfg, sub_cfg.dut_cfg, sub_cfg.dc_cfg)
         elif sub_cfg.dut_cfg.commit == 'vcs':
             vcs_test.main(cmt_cfg, sub_cfg.dut_cfg, sub_cfg.vcs_cfg)
         elif sub_cfg.dut_cfg.commit == 'dc':
             pass
-            # dc_test.main(cmt_cfg, sub_cfg.dut_cfg, sub_cfg.dc_cfg)
+            dc_test.main(cmt_cfg, sub_cfg.dut_cfg, sub_cfg.dc_cfg)
 
         del self.sub_list[0]
         with open(config.QUEUE_LIST_PATH, 'wb') as fp:

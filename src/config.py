@@ -29,10 +29,12 @@ VCS_RUN_DIR = f'{VCS_DIR}/run'
 VCS_CPU_DIR = f'{VCS_DIR}/cpu'
 VCS_SCRIPT_DIR = f'{VCS_DIR}/script'
 # dc
-DC_SRC_DIR = f'{HOME_DIR}/../lib/dc/bes_data/syn/scr'
-DC_CFG_DIR = f'{HOME_DIR}/../lib/dc/bes_data/common'
-DC_LOG_DIR = f'{DC_SRC_DIR}../log'
-DC_RPT_DIR = f'{DC_SRC_DIR}../rpt'
+DC_SRC_DIR = f'{HOME_DIR}/../dc/bes_data/syn/scr'
+DC_CFG_DIR = f'{HOME_DIR}/../dc/bes_data/common'
+DC_LOG_DIR = f'{DC_SRC_DIR}/../log'
+DC_RPT_DIR = f'{DC_SRC_DIR}/../rpt'
+# template
+TEMPLATE_DIR = f'{HOME_DIR}/../template'
 
 TESTCASE_NAME_LIST = ['hello', 'memtest', 'rtthread']
 TESTCASE_TYPE_LIST = ['flash', 'mem', 'sdram']

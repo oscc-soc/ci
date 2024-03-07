@@ -98,9 +98,11 @@ class VCSTest(object):
     def gen_wave_rpt(self):
         (prog_name, prog_type) = self.vcs_cfg.prog
         os.chdir(config.VCS_RUN_DIR)
+
         wave_name = f'{self.dut_cfg.top}_{prog_name}_{prog_type}'
         os.system(f'fsdb2vcd asic_top.fsdb -o {wave_name}.vcd')
         os.system(f'vcd2fst -v {wave_name}.vcd -f {wave_name}.fst')
+
         wave_path = self.gen_wave_dir()
         os.system(f'cp -rf {wave_name}.fst {wave_path}')
         os.chdir(wave_path)
