@@ -99,6 +99,7 @@ class VCSTest(object):
 
     def gen_wave_rpt(self):
         (prog_name, prog_type) = self.vcs_cfg.prog
+        prog_name = 'hello' # HACK:
         os.chdir(config.VCS_RUN_DIR)
 
         wave_name = f'{self.dut_cfg.top}_{prog_name}_{prog_type}'
@@ -134,7 +135,8 @@ class VCSTest(object):
             if self.vcs_cfg.wave == 'off':
                 os.system(f'make run test={prog_name}-{prog_type}')
             else:
-                os.system(f'make run test={prog_name}-{prog_type} wave=on')
+                # os.system(f'make run test={prog_name}-{prog_type} wave=on')
+                os.system(f'make run test=hello-{prog_type} wave=on') # HACK:
                 self.gen_wave_rpt()
 
             self.collect_run_log(prog_name, prog_type)
