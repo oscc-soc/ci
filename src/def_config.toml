@@ -34,6 +34,7 @@ freq        = 25                     # [dont use]
 prog        = {name = "", type = ""} # format: [name]-[type] name: [hello, memtest, rtthread] type: [flash, mem, sdram]
                                      # leave name item a blank mean test all programs
 wave        = "off"                  # [off on] note: wave option only valid when prog.name is not a blank and wave is "on"
+                                     # now only support prog.name == hello, other words dont support if you want to generate wave
 
 [dc]
 flag        = "dc"                   # commit flag [dont use]
