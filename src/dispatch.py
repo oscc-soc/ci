@@ -47,9 +47,11 @@ class Dispatch(object):
         elif sub_cfg.dut_cfg.commit == 'vcs':
             vcs_test.main(cmt_cfg, sub_cfg.dut_cfg, sub_cfg.vcs_cfg)
         elif sub_cfg.dut_cfg.commit == 'dc':
-            pass
             dc_test.main(cmt_cfg, sub_cfg.dut_cfg, sub_cfg.dc_cfg)
 
+        config.git_commit(
+            config.RPT_DIR, '[bot] new report!',
+            False)  # NOTE: need to set 'True' when in product env
         del self.sub_list[0]
         with open(config.QUEUE_LIST_PATH, 'wb') as fp:
             pickle.dump(self.sub_list, fp)

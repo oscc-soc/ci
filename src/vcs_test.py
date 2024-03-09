@@ -99,18 +99,35 @@ class VCSTest(object):
 
     def gen_wave_rpt(self):
         (prog_name, prog_type) = self.vcs_cfg.prog
-        prog_name = 'hello' # HACK:
+        prog_name = 'hello'  # HACK:
         os.chdir(config.VCS_RUN_DIR)
 
         wave_name = f'{self.dut_cfg.top}_{prog_name}_{prog_type}'
         os.system(f'fsdb2vcd asic_top.fsdb -o {wave_name}.vcd')
         os.system(f'vcd2fst -v {wave_name}.vcd -f {wave_name}.fst')
+        os.system(f'tar -czvf {wave_name}.fst.tar.bz2 {wave_name}.fst')
 
         wave_path = self.gen_wave_dir()
-        os.system(f'cp -rf {wave_name}.fst {wave_path}')
-        os.chdir(wave_path)
+        os.system(f'cp -rf {wave_name}.fst.tar.bz2 {wave_path}')
 
-        os.chdir(config.HOME_DIR)
+        cmd = f'curl -k -F "file=@{wave_name}.fst.tar.bz2"'
+        with open(f'{config.TEMPLATE_DIR}/wave.token', 'r',
+                  encoding='utf-8') as fp:
+            for v in fp:
+                if 'upload_cli' in v:
+                    cmd += f' -X POST {v.rstrip()}'
+                else:
+                    cmd += f' -F {v.rstrip()}'
+
+        logging.info(msg=f'{cmd}')
+
+        os.system(cmd)
+        os.system(f'rm -rf {wave_name}.fst')
+        os.system(f'rm -rf {wave_name}.vcd')
+        os.system(f'rm -rf {wave_name}.fst.tar.bz2')
+        config.git_commit(
+            config.WAVE_DIR, '[bot] new wave!',
+            False)  # NOTE: need to set 'True' when in product env
 
     def clear_wave_rpt(self):
         pass
@@ -136,7 +153,7 @@ class VCSTest(object):
                 os.system(f'make run test={prog_name}-{prog_type}')
             else:
                 # os.system(f'make run test={prog_name}-{prog_type} wave=on')
-                os.system(f'make run test=hello-{prog_type} wave=on') # HACK:
+                os.system(f'make run test=hello-{prog_type} wave=on')  # HACK:
                 self.gen_wave_rpt()
 
             self.collect_run_log(prog_name, prog_type)

@@ -8,6 +8,7 @@ import config
 import add_dut
 import repo_update
 import dispatch
+import log_ctrl
 
 
 # func:
@@ -21,6 +22,7 @@ def main_task():
     add_dut.main()
     repo_update.main()
     dispatch.main()
+    log_ctrl.main()
 
 
 # backup previous version run log

@@ -16,6 +16,7 @@ SUBMIT_LIST_PATH = f'{DATA_DIR}/submit_list'
 DUT_LIST_PATH = f'{DATA_DIR}/dut_list'
 QUEUE_LIST_PATH = f'{DATA_DIR}/queue_list'
 RUN_LOG_PATH = f'{DATA_DIR}/run.log'
+SAVE_LOG_PATH = f'{DATA_DIR}/save_log'
 # NOTE: need to modify the SUBMIT_DIR path for the CICD repo
 # now just for test
 SUBMIT_DIR = f'{HOME_DIR}/../tests/intg'
@@ -43,6 +44,8 @@ TESTCASE_RES_DICT = {
     'memtest': 'ALL TESTS PASSED!!',
     'rtthread': 'Hello RISC-V'
 }
+
+RUN_LOG_SIZE_LIMIT = 5 * 1024
 
 
 def exec_cmd(cmd: str) -> str:
@@ -74,9 +77,9 @@ def repl_str(file: str, old: str, pat: str):
 
 
 def git_commit(path: str, info: str, push: bool = False):
-    os.chdir(SUBMIT_DIR)
-    os.system('git add ' + path)
-    os.system('git commit -m "' + info + '"')
+    os.chdir(path)
+    os.system('git add .')
+    os.system(f'git commit -m "{info}"')
     if push:
         os.system('git push')
     os.chdir(HOME_DIR)
