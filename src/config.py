@@ -8,8 +8,8 @@ BRANCH_NAME_DEV = 'master'
 GMT_FORMAT = '%a %b %d %H:%M:%S %Y %z'
 STD_FOMRAT = '%Y-%m-%d %H:%M:%S'
 
-# CUR_BRAN = '202302'
-CUR_BRAN = 'main'  # NOTE: just for test
+CUR_BRAN = '202403'
+# CUR_BRAN = 'main'  # NOTE: just for test
 HOME_DIR = f'{os.getcwd()}'
 DATA_DIR = f'{HOME_DIR}/../data/{CUR_BRAN}'
 SUBMIT_LIST_PATH = f'{DATA_DIR}/submit_list'
@@ -19,19 +19,20 @@ RUN_LOG_PATH = f'{DATA_DIR}/run.log'
 SAVE_LOG_PATH = f'{DATA_DIR}/save_log'
 # NOTE: need to modify the SUBMIT_DIR path for the CICD repo
 # now just for test
-SUBMIT_DIR = f'{HOME_DIR}/../tests/intg'
+SUBMIT_DIR = '/home/liaoyuchi/Desktop/ysyx_ci_env/ysyx_ci_result'
+# SUBMIT_DIR = f'{HOME_DIR}/../tests/intg'
 SUB_DIR = f'{SUBMIT_DIR}/submit'
 RPT_DIR = f'{SUBMIT_DIR}/report'
-WAVE_DIR = f'{HOME_DIR}/../tests/wave'
+WAVE_DIR = f'{SUBMIT_DIR}/wave'
 
 # vcs
-VCS_DIR = f'{HOME_DIR}/../vcs'
+VCS_DIR = '/home/liaoyuchi/Desktop/ysyx_ci_env/vcs'
 VCS_RUN_DIR = f'{VCS_DIR}/run'
 VCS_CPU_DIR = f'{VCS_DIR}/cpu'
 VCS_SCRIPT_DIR = f'{VCS_DIR}/script'
 # dc
-DC_SRC_DIR = f'{HOME_DIR}/../dc/bes_data/syn/scr'
-DC_CFG_DIR = f'{HOME_DIR}/../dc/bes_data/common'
+DC_SRC_DIR = '/home/liaoyuchi/Desktop/ysyx_ci_env/dc/bes_data/syn/scr'
+DC_CFG_DIR = '/home/liaoyuchi/Desktop/ysyx_ci_env/dc/bes_data/common'
 DC_LOG_DIR = f'{DC_SRC_DIR}/../log'
 DC_RPT_DIR = f'{DC_SRC_DIR}/../rpt'
 # template
@@ -45,7 +46,7 @@ TESTCASE_RES_DICT = {
     'rtthread': 'Hello RISC-V'
 }
 
-RUN_LOG_SIZE_LIMIT = 5 * 1024
+RUN_LOG_SIZE_LIMIT = 5 * 1024 * 1024 # 5MB
 
 
 def exec_cmd(cmd: str) -> str:

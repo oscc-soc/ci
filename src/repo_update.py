@@ -1,6 +1,7 @@
 #!/bin/python
 import os
 import logging
+import copy
 from datetime import datetime
 import pickle
 from typing import Tuple
@@ -96,7 +97,7 @@ class DUTQueue(object):
             report.gen_state(parse_info)
             config.git_commit(
                 config.RPT_DIR, '[bot] update state file',
-                False)  # NOTE: need to set 'True' when in product env
+                True)  # NOTE: need to set 'True' when in product env
         else:
             logging.info(msg=f'[{dut_info.repo}] not changed')
 
@@ -123,17 +124,17 @@ class DUTQueue(object):
         with open(config.QUEUE_LIST_PATH, 'rb') as fp:
             self.old_sub_list = pickle.load(fp)
             for v in self.old_sub_list:
-                logging.info(msg=v)
+                logging.info(msg=f'old_sub_list: {v}')
             # check if new-submit duts are in self.sub_list
             for i, va in enumerate(self.old_sub_list):
                 for j, vb in enumerate(self.sub_list):
                     if va.cmt_cfg.repo == vb.cmt_cfg.repo:
-                        self.old_sub_list[i] = self.sub_list[j]
+                        self.old_sub_list[i] = copy.deepcopy(self.sub_list[j])
                         self.sub_list[j].cmt_cfg.repo = '@'
 
             for v in self.sub_list:
                 if v.cmt_cfg.repo != '@':
-                    self.old_sub_list.append(v)
+                    self.old_sub_list.append(copy.deepcopy(v))
 
         for v in self.old_sub_list:
             logging.info(msg=f'[after]{v}')

@@ -91,6 +91,12 @@ class DCTest(object):
                     self.err.append(line)
                     res += line
                 if re.match('^Warning:', line) is not None:
+                    if 'Clock group CLK_clock_others_1' in line:
+                        continue
+                    elif 'The trip points for the library named' in line:
+                        continue
+                    elif 'The specified replacement character' in line:
+                        continue
                     self.warn.append(line)
                     res += line
             res += f'****** Message Summary:{len(self.err)} Errors(s) '

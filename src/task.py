@@ -38,7 +38,7 @@ logging.basicConfig(filename=config.RUN_LOG_PATH,
                     level=logging.DEBUG)
 
 logging.info('\n=====NEW LOG======\n')  #TODO: add start screen
-schedule.every(1).seconds.do(main_task)
+schedule.every(3).minutes.do(main_task)
 
 while True:
     schedule.run_pending()
