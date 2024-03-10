@@ -3,6 +3,7 @@
 # import os
 import logging
 import pickle
+import copy
 import config
 import report
 # import iv_test
@@ -24,10 +25,15 @@ class Dispatch(object):
             if len(self.sub_list) == 0:
                 return False
 
-        # pop first queue info and dispatch tasks
+        # pop disp_first_cfg queue info and dispatch tasks
         logging.info(msg=f'task queue num: {len(self.sub_list)}')
-        cmt_cfg = self.sub_list[0].cmt_cfg
-        sub_cfg = self.sub_list[0].sub_cfg
+        disp_first_cfg = copy.deepcopy(self.sub_list[0])
+        cmt_cfg = disp_first_cfg.cmt_cfg
+        sub_cfg = disp_first_cfg.sub_cfg
+
+        del self.sub_list[0]
+        with open(config.QUEUE_LIST_PATH, 'wb') as fp:
+            pickle.dump(self.sub_list, fp)
 
         logging.info(msg=f'cmt_cfg: {cmt_cfg}')
         logging.info(msg=f'sub_cfg: {sub_cfg}')
@@ -40,6 +46,8 @@ class Dispatch(object):
             else:
                 report.gen_state(f'wait {i} duts')
 
+            config.git_commit(config.RPT_DIR, '[bot] update state file', True)
+
         # only dut pass vcs test, then it can be test by dc flow
         if sub_cfg.dut_cfg.commit == '':
             if vcs_test.main(cmt_cfg, sub_cfg.dut_cfg, sub_cfg.vcs_cfg):
@@ -49,12 +57,8 @@ class Dispatch(object):
         elif sub_cfg.dut_cfg.commit == 'dc':
             dc_test.main(cmt_cfg, sub_cfg.dut_cfg, sub_cfg.dc_cfg)
 
-        config.git_commit(
-            config.RPT_DIR, '[bot] new report!',
-            False)  # NOTE: need to set 'True' when in product env
-        del self.sub_list[0]
-        with open(config.QUEUE_LIST_PATH, 'wb') as fp:
-            pickle.dump(self.sub_list, fp)
+        config.git_commit(config.RPT_DIR, '[bot] new report!',
+                          True)  # NOTE: need to set 'True' when in product env
 
         return True
 

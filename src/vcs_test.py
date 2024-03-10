@@ -99,7 +99,6 @@ class VCSTest(object):
 
     def gen_wave_rpt(self):
         (prog_name, prog_type) = self.vcs_cfg.prog
-        prog_name = 'hello'  # HACK:
         os.chdir(config.VCS_RUN_DIR)
 
         wave_name = f'{self.dut_cfg.top}_{prog_name}_{prog_type}'
@@ -125,9 +124,9 @@ class VCSTest(object):
         os.system(f'rm -rf {wave_name}.fst')
         os.system(f'rm -rf {wave_name}.vcd')
         os.system(f'rm -rf {wave_name}.fst.tar.bz2')
-        config.git_commit(
-            config.WAVE_DIR, '[bot] new wave!',
-            False)  # NOTE: need to set 'True' when in product env
+        # config.git_commit(
+        #     config.WAVE_DIR, '[bot] new wave!',
+        #     True)  # NOTE: need to set 'True' when in product env
 
     def clear_wave_rpt(self):
         pass
@@ -148,14 +147,15 @@ class VCSTest(object):
                     self.collect_run_log(pl, mt)
 
         else:
-            self.program(self.dut_cfg.arch, prog_name, prog_type)
             if self.vcs_cfg.wave == 'off':
+                self.program(self.dut_cfg.arch, prog_name, prog_type)
                 os.system(f'make run test={prog_name}-{prog_type}')
             else:
-                # os.system(f'make run test={prog_name}-{prog_type} wave=on')
-                os.system(f'make run test=hello-{prog_type} wave=on')  # HACK:
+                self.vcs_cfg.prog = ('hello', prog_type)  # HACK:
+                prog_name = self.vcs_cfg.prog[0]
+                self.program(self.dut_cfg.arch, prog_name, prog_type)
+                os.system(f'make run test={prog_name}-{prog_type} wave=on')
                 self.gen_wave_rpt()
-
             self.collect_run_log(prog_name, prog_type)
 
     def gen_rpt_dir(self) -> str:
