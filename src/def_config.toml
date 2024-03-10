@@ -1,6 +1,8 @@
 # This is the default submit config
-# NOTE: below config if have bracket in line comment, that mean 
-# this config only supports string in bracket, other words dont support
+# NOTE: if there are brackets in the line comments in the following config, 
+# that means this config only supports words in the bracket, other words dont support
+# [dont use]: this option is not used
+# [fixed value]: this option is a fixed value, modify this option has no effect
 
 [meta]
 project = "demo"                     # [dont use]
@@ -9,14 +11,15 @@ version = "1.0"                      # [dont use]
 
 [dut]
 arch        = "rv64im"               # [rv32e rv32i rv32im rv64i rv64im]
-file        = "ysyx_xxxxxxxx.v"      # dut file name TODO: support filelist
+file        = "ysyx_xxxxxxxx.v"      # dut file name
 top         = "ysyx_xxxxxxxx"        # top module name
-clk         = "clk"                  # top clock signal name
-commit      = ""                     # support ["", "vcs", "dc"] leave a blank mean
-                                     # test vcs+dc, otherwise ci only run specific test 
-                                     # which commit equal below testsuit's flag.
-                                     # Now iverilog and verilator test are not supported.
-                                     # example: commit == "dc" mean only run dc test
+clk         = "clock"                # top clock signal name
+commit      = ""                     # ["", "vcs", "dc"]
+                                     # leaving a blank means test vcs+dc, otherwise 
+                                     # ci only run specific test when 'commit' == test's flag
+                                     # example: commit == "dc" means only run dc test
+                                     # now iverilog, verilator, yosys and fpga test
+                                     # are not supported.
 
 [iverilog]
 flag = "iv"                          # commit flag [dont use]
@@ -29,20 +32,21 @@ flag        = "yosys"                # commit flag [dont use]
 freq        = 25                     # [dont use]
 
 [vcs]
-flag        = "vcs"                  # commit flag [dont use]
+flag        = "vcs"                  # commit flag
 freq        = 25                     # [dont use]
 prog        = {name = "", type = ""} # format: [name]-[type] name: [hello, memtest, rtthread] type: [flash, mem, sdram]
-                                     # leave name item a blank mean test all programs
+                                     # leave name item a blank means testing all programs
 wave        = "off"                  # [off on] note: wave option only valid when prog.name is not a blank and wave is "on"
-                                     # now only support prog.name == hello, other words dont support if you want to generate wave
+                                     # now only support prog.name == hello, and prog.type can ben 'flash', 'mem' and 'sdram',
+                                     # other combinations dont support if you want to generate wave
 
 [dc]
-flag        = "dc"                   # commit flag [dont use]
+flag        = "dc"                   # commit flag
 process     = "28"                   # [110, 40, 28] [fixed value]
 freq        = 100                    # [100, 800, step: 50]
-corner      = "TYP"                  # [WCZ MAX WCL TYP MIN ML MZ]
+corner      = "MAX"                  # [WCZ MAX WCL TYP MIN ML MZ]
 track       = "9T"                   # [8T 9T 10T 11T 12T] [fixed value]
-volt_chnl   = "SVT40"                # voltage threshold and channel length secletion such as "SVT40+SVT35"
+volt_chnl   = "SVT40+LVT40"          # voltage threshold and channel length secletion such as "SVT40+SVT35"
                                      # or "SVT40+LVT35:0.3" to limit ration of LVT35 [fixed value]
 retime      = "off"                  # [off on]
 user        = ""                     # user report suffix [fixed value]
