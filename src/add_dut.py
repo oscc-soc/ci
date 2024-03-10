@@ -38,8 +38,10 @@ class DUT(object):
 
     def add(self):
         with open(config.SUBMIT_LIST_PATH, 'r', encoding='utf-8') as fp:
-            for url in fp:
-                repo = url.rstrip('\n').split('/')[-1]
+            for line in fp:
+                url = line.rstrip().split()[0]
+                repo = line.rstrip().split()[1]
+                logging.debug(msg=url)
                 logging.debug(msg=repo)
                 if self.check_valid(repo):
                     self.fill_data(url, repo)
