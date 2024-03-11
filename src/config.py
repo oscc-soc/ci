@@ -58,7 +58,7 @@ def exec_cmd(cmd: str) -> str:
     return ret
 
 
-def find_str(file: str, pat: str) -> True:
+def find_str(file: str, pat: str) -> bool:
     with open(file, 'r', encoding='utf-8') as fp:
         for line in fp:
             if re.match(pat, line):

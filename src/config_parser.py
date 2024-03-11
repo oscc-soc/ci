@@ -60,9 +60,9 @@ class ConfigParser(object):
                 return (False, 'top module dont exist')
 
             # not check if clk signal is in top module
-            if config.find_str(cfg_list['file'],
-                               f'\\s*{cfg_list["clk"]}\\s*,') is False:
-                return (False, 'clk signal in top module dont exist')
+            # if config.find_str(cfg_list['file'],
+            #                    f'\\s*{cfg_list["clk"]}\\s*') is False:
+            #     return (False, 'clk signal in top module dont exist')
         else:
             return (False, 'dut file dont exist')
 
