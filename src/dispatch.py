@@ -31,10 +31,6 @@ class Dispatch(object):
         cmt_cfg = disp_first_cfg.cmt_cfg
         sub_cfg = disp_first_cfg.sub_cfg
 
-        del self.sub_list[0]
-        with open(config.QUEUE_LIST_PATH, 'wb') as fp:
-            pickle.dump(self.sub_list, fp)
-
         logging.info(msg=f'cmt_cfg: {cmt_cfg}')
         logging.info(msg=f'sub_cfg: {sub_cfg}')
         # update queue state info of other dut
@@ -47,6 +43,10 @@ class Dispatch(object):
                 report.gen_state(f'wait {i} duts')
 
             config.git_commit(config.RPT_DIR, '[bot] update state file', True)
+
+        del self.sub_list[0]
+        with open(config.QUEUE_LIST_PATH, 'wb') as fp:
+            pickle.dump(self.sub_list, fp)
 
         # only dut pass vcs test, then it can be test by dc flow
         if sub_cfg.dut_cfg.commit == '':
