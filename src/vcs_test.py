@@ -83,6 +83,9 @@ class VCSTest(object):
                     self.warn.append(line)
                 elif log_state[2] == LogState.start:
                     self.err.append(line)
+        logging.info(msg=f'lint: {self.lint}')
+        logging.info(msg=f'warn: {self.warn}')
+        logging.info(msg=f'err: {self.err}')
 
     def collect_run_log(self, prog_name: str, prog_type: str):
         with open(f'{config.VCS_RUN_DIR}/run.log', 'r',
@@ -177,7 +180,8 @@ class VCSTest(object):
             fp.writelines(
                 '\n################\n#vcs compile log\n################\n')
 
-            if not self.err or not self.warn or not self.lint:
+            if len(self.err) == 0 and len(self.warn) == 0 and len(
+                    self.lint) == 0:
                 fp.writelines('all clear\n\n')
                 return True
             else:
