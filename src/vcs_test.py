@@ -1,6 +1,7 @@
 #!/bin/python
 
 from enum import Enum
+from typing import Tuple
 import os
 import logging
 import config
@@ -65,6 +66,7 @@ class VCSTest(object):
 
     def collect_comp_log(self):
         log_state = [LogState.end, LogState.end, LogState.end]
+        block_info = []
         with open(f'{config.VCS_RUN_DIR}/compile.log', 'r',
                   encoding='utf-8') as fp:
             for line in fp:
@@ -75,14 +77,26 @@ class VCSTest(object):
                 elif line[0:5] == 'Error':
                     log_state[2] = LogState.start
                 elif line == '\n':
+                    if log_state[0] == LogState.start and len(block_info) >= 2:
+                        self.lint += block_info
+                    elif log_state[1] == LogState.start:
+                        self.warn += block_info
+                    elif log_state[2] == LogState.start:
+                        self.err += block_info
                     log_state = [LogState.end, LogState.end, LogState.end]
+                    block_info = []
 
-                if log_state[0] == LogState.start:
-                    self.lint.append(line)
-                elif log_state[1] == LogState.start:
-                    self.warn.append(line)
-                elif log_state[2] == LogState.start:
-                    self.err.append(line)
+                if log_state[0] == LogState.start or log_state[
+                        1] == LogState.start or log_state[2] == LogState.start:
+                    if 'vga_ctrl' in line:
+                        log_state[0] = LogState.end
+                    else:
+                        block_info.append(line)
+
+        # filter the vga ctrl no used lint
+        for v in self.lint:
+            print(v)
+
         logging.info(msg=f'lint: {self.lint}')
         logging.info(msg=f'warn: {self.warn}')
         logging.info(msg=f'err: {self.err}')
@@ -104,7 +118,8 @@ class VCSTest(object):
         (prog_name, prog_type) = self.vcs_cfg.prog
         os.chdir(config.VCS_RUN_DIR)
 
-        wave_name = f'{self.dut_cfg.top}_{prog_name}_{prog_type}'
+        wave_name = f'{self.dut_cfg.top}_{self.cmt_cfg.date}-{self.cmt_cfg.time.replace(":", "-")}'
+        wave_name += f'_{prog_name}_{prog_type}'
         os.system(f'fsdb2vcd asic_top.fsdb -o {wave_name}.vcd')
         os.system(f'vcd2fst -v {wave_name}.vcd -f {wave_name}.fst')
         os.system(f'tar -czvf {wave_name}.fst.tar.bz2 {wave_name}.fst')
@@ -126,7 +141,7 @@ class VCSTest(object):
         os.system(cmd)
         os.system(f'rm -rf {wave_name}.fst')
         os.system(f'rm -rf {wave_name}.vcd')
-        os.system(f'rm -rf {wave_name}.fst.tar.bz2')
+        # os.system(f'rm -rf {wave_name}.fst.tar.bz2')
         # config.git_commit(
         #     config.WAVE_DIR, '[bot] new wave!',
         #     True)  # NOTE: need to set 'True' when in product env
@@ -188,22 +203,24 @@ class VCSTest(object):
                 fp.writelines(self.err + self.warn + self.lint)
                 return False
 
-    def gen_run_res(self, prog_name: str, prog_type: str) -> str:
-        res = ''
-
+    def gen_run_res(self, prog_name: str, prog_type: str) -> Tuple[bool, str]:
+        run_state = False
+        run_res = ''
         if self.run_res[f'{prog_name}-{prog_type}'] == '':
-            res += f'{prog_name} test in {prog_type} pass!!\n'
+            run_res += f'{prog_name} test in {prog_type} pass!!\n'
+            run_state = True
         else:
-            res += f'{prog_name} test in {prog_type} fail!!\n'
-            res += '======================================================\n'
-            res += self.run_res[f'{prog_name}-{prog_type}']
-            res += '======================================================\n\n'
+            run_res += f'{prog_name} test in {prog_type} fail!!\n'
+            run_res += '======================================================\n'
+            run_res += self.run_res[f'{prog_name}-{prog_type}']
+            run_res += '======================================================\n\n'
 
-        return res
+        return (run_state, run_res)
 
     def gen_run_rpt(self) -> bool:
         rpt_path = self.gen_rpt_dir()
         (prog_name, prog_type) = self.vcs_cfg.prog
+        run_res = True
         with open(f'{rpt_path}/vcs_report', 'a+', encoding='utf-8') as fp:
             fp.writelines(
                 '\n#####################\n#vcs program test\n#####################\n'
@@ -212,11 +229,17 @@ class VCSTest(object):
             if prog_name == 'all':
                 for pl in config.TESTCASE_NAME_LIST:
                     for mt in config.TESTCASE_TYPE_LIST:
-                        fp.writelines(self.gen_run_res(pl, mt))
+                        (test_res, test_info) = self.gen_run_res(pl, mt)
+                        if test_res is False:
+                            run_res = False
+                        fp.writelines(test_info)
             else:
-                fp.writelines(self.gen_run_res(prog_name, prog_type))
+                (test_res, test_info) = self.gen_run_res(prog_name, prog_type)
+                if test_res is False:
+                    run_res = False
+                fp.writelines(test_info)
 
-        return True
+        return run_res
 
 
 vcstest = VCSTest()

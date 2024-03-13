@@ -60,6 +60,12 @@ class Dispatch(object):
         config.git_commit(config.RPT_DIR, '[bot] new report!',
                           True)  # NOTE: need to set 'True' when in product env
 
+        report.send_mail(
+            ('maksyuki@126.com', 'on'),
+            f'{sub_cfg.dut_cfg.top}-{cmt_cfg.date}-{cmt_cfg.time}')
+        report.send_mail(
+            sub_cfg.meta_cfg.notif,
+            f'{sub_cfg.dut_cfg.top}-{cmt_cfg.date}-{cmt_cfg.time}')
         return True
 
 

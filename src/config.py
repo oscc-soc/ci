@@ -47,7 +47,7 @@ TESTCASE_RES_DICT = {
 }
 
 RUN_LOG_SIZE_LIMIT = 5 * 1024 * 1024 # 5MB
-
+SEND_MAIL_URL = 'maksyuki@qq.com'
 
 def exec_cmd(cmd: str) -> str:
     try:

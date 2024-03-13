@@ -13,6 +13,17 @@ class DUTInfo(object):
         return f'url: {self.url} repo: {self.repo} flag: {self.flag}'
 
 
+class MetaConfig(object):
+    def __init__(self, proj: str, auth: str, ver: str, notif: Tuple[str, str]):
+        self.proj = proj
+        self.auth = auth
+        self.ver = ver
+        self.notif = notif
+
+    def __str__(self) -> str:
+        return f'proj: {self.proj} auth: {self.auth} ver: {self.ver} notif: {self.notif}'
+
+
 class DUTConfig(object):
     def __init__(self, arch: str, file: str, top: str, clk: str, commit: str):
         self.arch = arch
@@ -80,9 +91,10 @@ class CommitConfig(object):
 
 
 class SubmitConfig(object):
-    def __init__(self, dut_cfg: DUTConfig, iv_cfg: IverilogConfig,
-                 ver_cfg: VerilatorConfig, vcs_cfg: VCSConfig,
-                 dc_cfg: DCConfig):
+    def __init__(self, meta_cfg: MetaConfig, dut_cfg: DUTConfig,
+                 iv_cfg: IverilogConfig, ver_cfg: VerilatorConfig,
+                 vcs_cfg: VCSConfig, dc_cfg: DCConfig):
+        self.meta_cfg = meta_cfg
         self.dut_cfg = dut_cfg
         self.iv_cfg = iv_cfg
         self.ver_cfg = ver_cfg
@@ -90,9 +102,9 @@ class SubmitConfig(object):
         self.dc_cfg = dc_cfg
 
     def __str__(self) -> str:
-        return f'''dut_cfg: {self.dut_cfg} iv_cfg: {self.iv_cfg}
-                   ver_cfg: {self.ver_cfg} vcs_cfg: {self.vcs_cfg} 
-                   dc_cfg: {self.dc_cfg}'''
+        return f'''meta_cfg: {self.meta_cfg} dut_cfg: {self.dut_cfg}
+                   iv_cfg: {self.iv_cfg} ver_cfg: {self.ver_cfg}
+                   vcs_cfg: {self.vcs_cfg} dc_cfg: {self.dc_cfg}'''
 
 
 class QueueInfo(object):

@@ -4,24 +4,25 @@ import logging
 from typing import Any, Dict, Tuple, List
 import tomli
 import config
-from data_type import DUTConfig, IverilogConfig
-from data_type import VerilatorConfig, VCSConfig
-from data_type import DCConfig, SubmitConfig
+from data_type import MetaConfig, DUTConfig
+from data_type import IverilogConfig, VerilatorConfig
+from data_type import VCSConfig, DCConfig, SubmitConfig
 
 
 class ConfigParser(object):
     def __init__(self):
+        self.def_meta = MetaConfig('', '', '', ('', 'off'))
         self.def_dut = DUTConfig('', '', '', '', '')
         self.def_iv = IverilogConfig('')
         self.def_ver = VerilatorConfig('')
         self.def_vcs = VCSConfig(25, ('', ''), False)
         self.def_dc = DCConfig('', 100, 'TYP', '', '', False, '')
-        self.sub_cfg = SubmitConfig(self.def_dut, self.def_iv, self.def_ver,
-                                    self.def_vcs, self.def_dc)
+        self.sub_cfg = SubmitConfig(self.def_meta, self.def_dut, self.def_iv,
+                                    self.def_ver, self.def_vcs, self.def_dc)
 
     def clear(self):
-        self.sub_cfg = SubmitConfig(self.def_dut, self.def_iv, self.def_ver,
-                                    self.def_vcs, self.def_dc)
+        self.sub_cfg = SubmitConfig(self.def_meta, self.def_dut, self.def_iv,
+                                    self.def_ver, self.def_vcs, self.def_dc)
 
     def check_item(self, item: str, cfg_list: Dict[str, Any],
                    option_list: List[str]) -> Tuple[bool, str, str]:
@@ -34,6 +35,35 @@ class ConfigParser(object):
                 return (True, f'{item} check done with no error', v)
 
         return (False, f'{item} cfg item value is wrong', '')
+
+    #NOTE: no check the code
+    def check_proj_auth_ver(self, cfg_list: Dict[str,
+                                                 Any]) -> Tuple[bool, str]:
+        if cfg_list.get('project') is not None:
+            self.sub_cfg.meta_cfg.proj = cfg_list['project']
+
+        if cfg_list.get('author') is not None:
+            self.sub_cfg.meta_cfg.auth = cfg_list['author']
+
+        if cfg_list.get('version') is not None:
+            self.sub_cfg.meta_cfg.ver = cfg_list['version']
+
+        return (True, 'proj, auth and ver check done with no error')
+
+    #NOTE: no check the code
+    def check_notif(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        if cfg_list.get('notif') is not None:
+            (notif_mail, notif_ena) = cfg_list['notif']
+            if notif_ena != 'off' and notif_ena != 'on':
+                return (False, 'notif ena item value is wrong')
+
+            # HACK: add more detailed check function
+            if not '@' in notif_mail:
+                return (False, 'notif mail item value is wrong')
+
+            self.sub_cfg.meta_cfg.notif = cfg_list['notif']
+
+        return (True, 'notif check done with no error')
 
     def check_arch(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
         option_list = ['rv32e', 'rv32i', 'rv32im', 'rv64i', 'rv64im']
@@ -172,6 +202,12 @@ class ConfigParser(object):
             self.sub_cfg.dut_cfg.commit = ck_val
         return (ck_state, ck_info)
 
+    def check_meta(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
+        if cfg_list.get('meta') is None:
+            return (False, 'dont have meta cfg table')
+
+        return (True, 'check meta cfg table done with no error')
+
     def check_dut(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
         if cfg_list.get('dut') is None:
             return (False, 'dont have dut cfg table')
@@ -245,6 +281,10 @@ class ConfigParser(object):
                 logging.info(msg=toml_cfg)
                 os.chdir(core_dir)
                 # check and parse config
+                check_res = self.check_meta(toml_cfg)
+                if check_res[0] is False:
+                    return check_res
+
                 check_res = self.check_dut(toml_cfg)
                 if check_res[0] is False:
                     return check_res
