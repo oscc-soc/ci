@@ -37,12 +37,18 @@ class Dispatch(object):
         for i, v in enumerate(self.sub_list):
             report.create_dir(v.cmt_cfg.repo)
             logging.info(msg=f'[dispatch update info]: {v.cmt_cfg.repo}')
+            state_desc = ''
             if i == 0:
-                report.gen_state('under test')
+                state_desc = 'under test'
             else:
-                report.gen_state(f'wait {i} duts')
+                state_desc = f'wait {i} duts'
 
+            report.gen_state(state_desc)
             config.git_commit(config.RPT_DIR, '[bot] update state file', True)
+            report.send_mail(
+                v.sub_cfg.meta_cfg.notif,
+                f'{v.sub_cfg.dut_cfg.top}-{v.cmt_cfg.date}-{v.cmt_cfg.time}',
+                'state', state_desc)
 
         del self.sub_list[0]
         with open(config.QUEUE_LIST_PATH, 'wb') as fp:
@@ -62,10 +68,10 @@ class Dispatch(object):
 
         report.send_mail(
             ('maksyuki@126.com', 'on'),
-            f'{sub_cfg.dut_cfg.top}-{cmt_cfg.date}-{cmt_cfg.time}')
+            f'{sub_cfg.dut_cfg.top}-{cmt_cfg.date}-{cmt_cfg.time}', 'info')
         report.send_mail(
             sub_cfg.meta_cfg.notif,
-            f'{sub_cfg.dut_cfg.top}-{cmt_cfg.date}-{cmt_cfg.time}')
+            f'{sub_cfg.dut_cfg.top}-{cmt_cfg.date}-{cmt_cfg.time}', 'info')
         return True
 
 

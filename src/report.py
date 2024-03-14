@@ -19,29 +19,36 @@ def create_dir(repo: str):
     os.system(f'mkdir -p {report.dut_rpt_dir}')
 
 
-def send_mail(notif_cfg: Tuple[str, str], commit: str):
+def send_mail(notif_cfg: Tuple[str, str],
+              commit: str,
+              flag: str,
+              state_desc: str = ''):
     (rcpt_mail_url, send_ena) = notif_cfg
     if send_ena == 'on':
         cmd = 'curl --url smtp://smtp.qq.com'
         cmd += f' --mail-from {config.SEND_MAIL_URL}'
         cmd += f' --mail-rcpt {rcpt_mail_url}'
         os.system(
-            f'cp -rf {config.TEMPLATE_DIR}/mail.info {config.DATA_DIR}/tmp_mail.info'
+            f'cp -rf {config.TEMPLATE_DIR}/mail.{flag} {config.DATA_DIR}/tmp_mail.{flag}'
         )
 
-        config.repl_str(f'{config.DATA_DIR}/tmp_mail.info',
+        config.repl_str(f'{config.DATA_DIR}/tmp_mail.{flag}',
                         'TEMPLATE_SEND_MAIL_URL', config.SEND_MAIL_URL)
 
-        config.repl_str(f'{config.DATA_DIR}/tmp_mail.info',
+        config.repl_str(f'{config.DATA_DIR}/tmp_mail.{flag}',
                         'TEMPLATE_RCPT_MAIL_URL', rcpt_mail_url)
 
-        config.repl_str(f'{config.DATA_DIR}/tmp_mail.info', 'TEMPLATE_NAME',
+        config.repl_str(f'{config.DATA_DIR}/tmp_mail.{flag}', 'TEMPLATE_NAME',
                         rcpt_mail_url.split('@')[0])
 
-        config.repl_str(f'{config.DATA_DIR}/tmp_mail.info', 'TEMPLATE_COMMIT',
-                        commit)
+        config.repl_str(f'{config.DATA_DIR}/tmp_mail.{flag}',
+                        'TEMPLATE_COMMIT', commit)
 
-        cmd += f' --upload-file {config.DATA_DIR}/tmp_mail.info'
+        if flag == 'state':
+            config.repl_str(f'{config.DATA_DIR}/tmp_mail.{flag}',
+                            'TEMPLATE_STATE', state_desc)
+
+        cmd += f' --upload-file {config.DATA_DIR}/tmp_mail.{flag}'
         with open(f'{config.TEMPLATE_DIR}/mail.token', 'r',
                   encoding='utf-8') as fp:
             for v in fp:
@@ -56,7 +63,7 @@ def gen_state(stat: str):
 
 def main():
     logging.info(msg='[return report]')
-    send_mail('maksyuki@126.com', '2024-03-11-09:52:51')
+    send_mail('maksyuki@126.com', '2024-03-11-09:52:51', 'info')
 
 
 if __name__ == '__main__':
