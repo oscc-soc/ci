@@ -8,6 +8,8 @@
 project = "demo"                     # [dont use]
 author  = "Ben"                      # [dont use]
 version = "1.0"                      # [dont use]
+notif   = {mail = "", ena = "off"}   # ena: [off on]
+
 
 [dut]
 arch        = "rv64im"               # [rv32e rv32i rv32im rv64i rv64im]
