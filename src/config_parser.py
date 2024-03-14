@@ -53,16 +53,22 @@ class ConfigParser(object):
     #NOTE: no check the code
     def check_notif(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
         if cfg_list.get('notif') is not None:
-            (notif_mail, notif_ena) = cfg_list['notif']
-            if notif_ena != 'off' and notif_ena != 'on':
-                return (False, 'notif ena item value is wrong')
+            notif = cfg_list['notif']
 
-            # HACK: add more detailed check function
-            if not '@' in notif_mail:
-                return (False, 'notif mail item value is wrong')
+            if notif.get('mail') is not None and notif.get('ena') is not None:
+                notif_mail = notif['mail']
+                notif_ena = notif['ena']
+                logging.info(
+                    msg=f'notif_mail: {notif_mail} notif_ena: {notif_ena}')
+                if notif_ena != 'off' and notif_ena != 'on':
+                    return (False, 'notif ena item value is wrong')
 
-            self.sub_cfg.meta_cfg.notif = cfg_list['notif']
+                # HACK: add more detailed check function
+                if not '@' in notif_mail:
+                    return (False, 'notif mail item value is wrong')
 
+                self.sub_cfg.meta_cfg.notif = (notif_mail, notif_ena)
+                logging.info(msg=f'[notif]: {cfg_list["notif"]}')
         return (True, 'notif check done with no error')
 
     def check_arch(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
@@ -205,6 +211,14 @@ class ConfigParser(object):
     def check_meta(self, cfg_list: Dict[str, Any]) -> Tuple[bool, str]:
         if cfg_list.get('meta') is None:
             return (False, 'dont have meta cfg table')
+
+        check_res = self.check_proj_auth_ver(cfg_list['meta'])
+        if check_res[0] is False:
+            return check_res
+
+        check_res = self.check_notif(cfg_list['meta'])
+        if check_res[0] is False:
+            return check_res
 
         return (True, 'check meta cfg table done with no error')
 
